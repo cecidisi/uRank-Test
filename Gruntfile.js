@@ -25,9 +25,9 @@ module.exports = function (grunt) {
 
   // Configurable paths
   var config = {
-    app: '.',
-    libs: './libs',
-    htmlFile: './index.html'
+    app: 'app',
+    libs: 'app/libs',
+    htmlFile: 'app/index.html'
   };
 
   // Define the configuration for all the tasks
@@ -36,6 +36,9 @@ module.exports = function (grunt) {
     // Project settings
     config: config,
 
+   'bower-install-simple': {
+       urank: {}
+   },
     // Automatically inject Bower components into the HTML file
     wiredep: {
       urank: {
@@ -108,27 +111,32 @@ module.exports = function (grunt) {
 //  Register urank tasks
 
   grunt.registerTask('urank-wiredep', [
+      'bower-install-simple:urank',
       'wiredep:urank'
   ]);
 
 
   grunt.registerTask('urank-load', [
+      'bower-install-simple:urank',
       'bowercopy:urank',
       'injector:urank'
   ]);
 
 
   grunt.registerTask('urank-load-all', [
+      'bower-install-simple:urank',
       'bowercopy:urank',
       'bowercopy:urank_dep',
       'injector:urank_all'
   ]);
 
   grunt.registerTask('urank-copy', [
+      'bower-install-simple:urank',
       'bowercopy:urank',
   ]);
 
   grunt.registerTask('urank-copy-all', [
+      'bower-install-simple:urank',
       'bowercopy:urank',
       'bowercopy:urank_dep',
   ]);
