@@ -1,0 +1,25 @@
+{
+  "name": "urank-test",
+  "version": "0.0.1",
+  "homepage": "https://github.com/cecidisi/uRank",
+  "authors": [
+    "cdisciascio <cecidisi@gmail.com>"
+  ],
+  "description": "Testing uRank as bower package and grunt tasks",
+  "main": "index.html",
+  "keywords": [
+    "testing"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+      "jquery": "~2.1.4",
+      "urank": "~0.0.1"
+  }
+}

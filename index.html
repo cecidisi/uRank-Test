@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>uRank Test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- bower:css -->
+        <!-- endbower -->
+
+        <!-- injector:css -->
+        <!-- endinjector -->
+
+        <link rel="stylesheet" type="text/css" href="css/main-style.css" />
+    </head>
+
+    <body>
+        <header>                            <!-- top panel -->
+            <select id="select-dataset"></select>
+      	</header>
+
+        <div class="main-panel">
+
+            <div id="tagcloud"></div>       <!-- left panel -->
+
+            <div class="central-panel">     <!-- central panel, including list and ranking -->
+
+                <div class="control-panel">
+                    <div class="ranking-controls">
+                        <button id="btn-reset" title="Reset">
+                            <span class="sprite-reset"></span>
+                        </button>
+                        <button id="btn-sort-by-overall-score" title="Sort by overall score">
+                            <span class="sprite-sort-down"></span>
+                        </button>
+                        <button id="btn-sort-by-max-score" title="Sort by maximum score">
+                            <span class="sprite-wiggle"></span>
+                        </button>
+                    </div>
+
+                    <div id="tagbox"></div>
+
+                </div>
+
+                <div class="vis-panel">
+                    <div id="contentlist" ></div>
+                    <div id="viscanvas"></div>
+                </div>
+            </div>
+            <div id="docviewer"></div>      <!-- right panel -->
+
+		</div>
+
+        <div class="processing-message">Processing Data...</div>
+
+
+        <!-- bower:js -->
+        <!-- endbower -->
+
+        <!-- injector:js -->
+        <!-- endinjector -->
+
+        <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js" ></script>
+        <script type="text/javascript" src="../urank-loader.js"></script>
+        <script type="text/javascript" src="../urank.js"></script>
+        <script type="text/javascript" src="js/datasetManager.js" charset="utf-8" ></script>
+        <script type="text/javascript" src="js/main.js" charset="utf-8"></script>
+
+    </body>
+</html>

@@ -1,0 +1,309 @@
+html {
+    width: 100%;
+    height: 100%;
+
+}
+
+body{
+    overflow: hidden;
+    width: calc(100% - 1em);
+    height: calc(100% - 1em);
+    margin: .5em;
+    background: white;
+    font-size: 1em;
+    font-family: Lucida, Lucida Grande, Verdana,Arial,sans-serif;
+}
+
+
+
+h1 {
+    font-size: 0.9em;
+    -webkit-margin-before: 0.5em;
+    -webkit-margin-after: 0.5em;
+}
+
+h3 {
+    font-size: .95em;
+    font-weight: normal;
+    line-height: 1em;
+    -webkit-margin-before: 0.2em;
+    -webkit-margin-after: 0.2em;
+}
+
+p {
+    font-size: 0.8em;
+}
+
+
+span {
+    font-size: 1em;
+}
+
+
+select {
+    font-size: 1em;
+    text-align: left;
+    border: 0.1em #ddd solid;
+}
+
+
+text {
+    font-size: 0.85em;
+}
+
+
+
+body a{
+    text-decoration:none;
+    color: #529CBF;
+}
+
+
+div{
+    display:block;
+}
+
+
+input[type="button"], button {
+    display: inline-block;
+    margin: 0em 0.1em;
+    z-index: 0;
+    cursor: pointer;
+    font-size: 1.05em;
+    text-decoration: none;
+    text-align: center;
+    height: 24px;
+    min-width: 74px;
+
+    background: -webkit-linear-gradient(top, #eee, #ddd);
+    background: linear-gradient(top, #eee, #ddd, #eee);
+    border: 0.1em solid #ddd;
+    border-radius: 0.5em;
+    box-shadow: 0em 0.1em .1em #999;
+    color: rgb(102, 102, 102);
+    text-shadow: 0em 0.1em #fff;
+}
+
+
+/*
+Hover style for all buttons
+*/
+input[type="button"]:hover, button:hover {
+    background: -webkit-linear-gradient(top, #eee, #ccc);
+    border: 0.1em solid #ccc;
+}
+
+
+
+select {
+    background-color: white;
+    border: 0.1em #ddd solid;
+    border-radius: 0.5em;
+    color: #666;
+}
+
+
+
+@media (min-width: 300px) {
+    body { font-size: .4em; }
+}
+
+@media (min-width: 500px) {
+    body { font-size: .5em; }
+}
+
+@media (min-width: 700px) {
+    body { font-size: .6em; }
+}
+
+@media (min-width: 900px) {
+    body { font-size: .7em; }
+}
+
+@media (min-width: 1200px) {
+    body { font-size: .75em; }
+}
+
+
+@media (min-width: 1800px) {
+    body { font-size: .8em; }
+}
+
+
+
+
+
+/***************************************************************************************************/
+
+header {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    height: 5em;
+    padding: .5em 0em;
+    background: -webkit-linear-gradient(top, rgba(102, 102, 102, 1), rgba(115, 115, 115, 1), rgba(102, 102, 102, 1));
+}
+
+header select{
+    height: 23px;
+    margin: 16px 14px;
+}
+
+
+/***************************************************************************************************/
+
+
+.main-panel {
+	display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+	height: calc(100% - 6em);
+    text-align: center;
+	vertical-align: top;
+}
+
+
+
+#tagcloud {
+    float: left;
+    width: 17%;
+    height: calc(100% - 1em);
+}
+
+
+
+.central-panel {
+    display: inline-block;
+    width: 61%;
+    height: 100%;
+}
+
+
+.control-panel {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 100%;
+    height: 9%;
+    min-height: 4.5em;
+}
+
+
+/*
+*   Ranking Controls (upper mid-left)
+*
+*/
+
+.ranking-controls {
+	display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 45%;
+    background: -webkit-linear-gradient(top, rgba(245, 245, 245, 1), rgba(230, 230, 230, 1));
+    box-shadow: inset .1em .1em .5em #ccc, inset -.1em -.1em .5em #ccc;
+}
+
+
+.ranking-controls button {
+    min-width: 2.1em;
+    height: 1.7em;
+    margin: .6em .3em;
+    padding: .3em .6em;
+    border-radius: .9em;
+}
+
+
+.ranking-controls button span {
+    /*width: 100%;
+    height: 100%;*/
+    background-image: url(../media/sprites.png);
+    background-repeat: no-repeat;
+    display: block;
+}
+
+
+.ranking-controls button span.sprite-reset {
+    width: 16px;
+    height: 16px;
+    background-position: -5px -5px;
+}
+
+.ranking-controls button span.sprite-sort-down {
+    width: 16px;
+    height: 11px;
+    background-position: -31px -5px;
+}
+
+.ranking-controls button span.sprite-wiggle {
+    width: 16px;
+    height: 16px;
+    background-position: -57px -5px;
+}
+
+
+/*
+*   Tagbox (upper mid-right header)
+*/
+#tagbox {
+    float: right;
+    width: 55%;
+}
+
+
+
+/***************************************************************************************************/
+
+.vis-panel {
+    display: inline-block;
+    width: 100%;
+    height: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#contentlist {
+    float: left;
+    width: 45%;
+}
+
+
+#viscanvas {
+    width: 55%;
+    min-height: 99%;
+}
+
+
+
+/***************************************************************************************************/
+
+#docviewer {
+    display: flex;
+    flex-direction: column;
+    float: right;
+    width: 21%;
+    height: calc(100% - 1em);
+    padding: .5em;
+}
+
+
+/***************************************************************************************************/
+
+
+.processing-message {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 20em;
+    height: 10em;
+    left: calc(50% - 10em);
+    top: calc(50% - 5em);
+    background: -webkit-linear-gradient(top, #00441b, #006d2c, #00441b);
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: white;
+}
+
+
