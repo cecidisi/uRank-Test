@@ -61,7 +61,7 @@ module.exports = function (grunt) {
     bowercopy: {
         options: {
             srcPrefix: 'bower_components',
-            clean: false,
+            clean: true,       // to clean bower_components folder after moving necessary files, change this flag to true
             ignore: ['*bower.json']
         },
         urank: {
@@ -93,9 +93,9 @@ module.exports = function (grunt) {
         urank: {
             files: {
                 '<%= config.htmlFile %>': ['<%= config.libs %>/urank/**/*.js',
-                                                 '<%= config.libs %>/urank/**/*.css',
-                                                 '!<%= config.libs %>/urank/dependencies/**/*.js',
-                                                 '!<%= config.libs %>/urank/dependencies/**/*.css']
+                                            '<%= config.libs %>/urank/**/*.css',
+                                            '!<%= config.libs %>/urank/dependencies/**/*.js',
+                                            '!<%= config.libs %>/urank/dependencies/**/*.css']
             }
         },
         urank_all: {
