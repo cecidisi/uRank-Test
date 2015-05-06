@@ -169,7 +169,7 @@ header select, header input[type="button"]{
 #tagcloud {
     float: left;
     width: 17%;
-    height: calc(100% - 1em);
+    height: calc(100% - 25px);
 }
 
 
@@ -283,7 +283,7 @@ header select, header input[type="button"]{
     flex-direction: column;
     float: right;
     width: 21%;
-    height: calc(100% - 1em);
+    height: calc(100% - 9px);
     padding: .5em;
 }
 
