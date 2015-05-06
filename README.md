@@ -12,12 +12,12 @@ Gruntfile.js sets a config object with 3 paths:
   * 'htmlFile': path to file where you wan t to inject urank files and dependencies (here `app/index.html`)
 
 There are 3 ways of downloading urank and including necessary files in you HTML:
-  1. To downlaod urank to `bower_components` and include urank and dependencies directly this folder, run: 
+  1. To downlaod urank to `bower_components` and include urank and dependencies directly from this folder, run: 
     ```grunt urank-wiredep``` (recommended)
-  2. To downlaod urank to `bower_components`, copy BOTH urank files AND dependencies into a folder in your project (`app/libs`), include ALL files in your HTML and delete `bower_components`, run: 
+  2. To downlaod urank to `bower_components`, copy BOTH urank files AND dependencies into a folder in your project (`app/libs`), include ALL files in your HTML and delete `bower_components` folder, run: 
     ```grunt urank-load-all```.
     Note: to avoid deleting `bower_components`, set the flag `bowercopy.options.clean = false` in `Gruntfile.js`
-  3. To downlaod urank to `bower_components`, copy ONLY uRank files into a folder in your project (`app/libs`) and include these files in your HTML run: 
+  3. To downlaod urank to `bower_components`, copy ONLY uRank files into a folder in your project (`app/libs`), include these files in your HTML and delete `bower_components` run: 
     ```grunt urank-load```
 
 
