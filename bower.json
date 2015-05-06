@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-      "jquery": "~2.1.4",
-      "urank": "~0.0.1"
+    "jquery": "~2.1.4",
+    "urank": "~0.0.1"
   }
 }

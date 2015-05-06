@@ -78,10 +78,12 @@ module.exports = function (grunt) {
                 'd3pie.min.js': 'd3pie/d3pie/d3pie.min.js',
                 'hint.min.css': 'hint/dist/hint.min.css',
                 'jquery.min.js': 'jquery/dist/jquery.min.js',
+                'jquery.min.map': 'jquery/dist/jquery.min.map',
                 'jquery-ui.min.js': 'jquery-ui/jquery-ui.min.js',
                 'theme/jquery-ui.min.css': 'jquery-ui/themes/base/jquery-ui.min.css',
                 'theme/images': 'jquery-ui/themes/base/images',
-                'underscore.min.js': 'underscore/underscore-min.js'
+                'underscore-min.js': 'underscore/underscore-min.js',
+                'underscore-min.map': 'underscore/underscore-min.map'
             }
         }
     },

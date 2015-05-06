@@ -2,28 +2,56 @@
 
     var _this = this;
     this.dsm = new datasetManager();
-
-    // Fill dataset select options and bind event handler
-    var datasetOptions = "";
-    this.dsm.getIDsAndDescriptions().forEach(function(ds){
-        datasetOptions += "<option value='" + ds.id + "'>" + ds.description + "</option>";
-    });
-    $("#select-dataset").html(datasetOptions);
+    this.currentRanking = {};
 
 
     // Event handler for dataset-select change
     var selectDatasetChanged = function(){
-
-        $('.processing-message').css('visibility', 'visible');
+        $('.processing-message').show();
         var datasetId = $("#select-dataset").val();
         _this.urank.clear();
         setTimeout(function(){
             _this.dsm.getDataset(datasetId, function(dataset){
                 _this.urank.loadData(dataset);
-                $('.processing-message').css('visibility', 'hidden');
+                $('.processing-message').hide();
             });
         }, 10);
     };
+
+    //  Event handler for "Download ranking" button
+    var btnDownloadClicked = function(event) {
+
+        console.log('download - ' + $('#select-download').val());
+        var scriptURL = '../server/download.php',
+            date = new Date(),
+            timestamp = date.getFullYear() + '-' + (parseInt(date.getMonth()) + 1) + '-' + date.getDate() + '_' + date.getHours() + '.' + date.getMinutes() + '.' + date.getSeconds(),
+            urankState = _this.urank.getUrankState();
+
+        if($('#select-download').val() == '2files'){
+
+            $.generateFile({
+                filename: 'urank_selected_keywords_' + timestamp + '.txt',
+                content	: JSON.stringify(urankState.selectedKeywords),
+                script	: scriptURL
+            });
+
+            $.generateFile({
+                filename: 'urank_ranking_' + timestamp + '.txt',
+                content	: JSON.stringify(urankState.ranking),
+                script	: scriptURL
+            });
+        }
+        else {
+            $.generateFile({
+                filename: 'urank_state_' + timestamp + '.txt',
+                content	: JSON.stringify(urankState),
+                script	: scriptURL
+            });
+        }
+
+        event.preventDefault();
+    };
+
 
     //  uRank initialization options
     var urankOptions = {
@@ -32,25 +60,31 @@
         contentListRoot: '#contentlist',
         visCanvasRoot: '#viscanvas',
         docViewerRoot: '#docviewer'
-        //,style: 'custom'
     };
 
     // uRank initialization function to be passed as callback
-    var init = function(urank){
+    this.urank = new Urank(urankOptions);
 
-        _this.urank = urank;
-        // Bind event handlers for dataset select
-        $("#select-dataset").change(selectDatasetChanged);
-        // Bind event handlers for urank specific buttons
-        $('#btn-reset').off().on('click', urank.reset);
-        $('#btn-sort-by-overall-score').off().on('click', urank.rankByOverallScore);
-        $('#btn-sort-by-max-score').off().on('click', urank.rankByMaximumScore);
+    // Fill dataset select options and bind event handler
+    var datasetOptions = "";
+    this.dsm.getIDsAndDescriptions().forEach(function(ds){
+        datasetOptions += "<option value='" + ds.id + "'>" + ds.description + "</option>";
+    });
 
-        $('#select-dataset').trigger('change');
-    };
+    // Add dataset options and bind event handlers for dataset select
+    $("#select-dataset").html(datasetOptions).change(selectDatasetChanged);
 
-    //  Calling Urank
-    UrankLoader(init, urankOptions);
+    // Bind event handlers for "download ranking" button
+    $('#btn-download').click(btnDownloadClicked);
+
+    // Bind event handlers for urank specific buttons
+    $('#btn-reset').off().on('click', this.urank.reset);
+    $('#btn-sort-by-overall-score').off().on('click', this.urank.rankByOverallScore);
+    $('#btn-sort-by-max-score').off().on('click', this.urank.rankByMaximumScore);
+
+    // Trigger change evt to load first dataset in select options
+    $('#select-dataset').trigger('change');
+
 
 })();
 

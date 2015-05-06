@@ -18,6 +18,11 @@
     <body>
         <header>                            <!-- top panel -->
             <select id="select-dataset"></select>
+            <select id="select-download">
+                <option value="2files">Keyword &amp; ranking in 2 files</option>
+                <option value="1file">All in 1 file</option>
+            </select>
+            <input type="button" id="btn-download" value="Download"/>
       	</header>
 
         <div class="main-panel">
@@ -61,11 +66,9 @@
         <!-- injector:js -->
         <!-- endinjector -->
 
-        <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js" ></script>
-        <script type="text/javascript" src="../urank-loader.js"></script>
-        <script type="text/javascript" src="../urank.js"></script>
-        <script type="text/javascript" src="js/datasetManager.js" charset="utf-8" ></script>
+        <!-- App scripts -->
+        <script type="text/javascript" src="js/dataset-manager.js" charset="utf-8" ></script>
+        <script type="text/javascript" src="libs/fileGenerator.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/main.js" charset="utf-8"></script>
-
     </body>
 </html>
