@@ -21,33 +21,18 @@
     //  Event handler for "Download ranking" button
     var btnDownloadClicked = function(event) {
 
-        console.log('download - ' + $('#select-download').val());
         var scriptURL = '../server/download.php',
             date = new Date(),
             timestamp = date.getFullYear() + '-' + (parseInt(date.getMonth()) + 1) + '-' + date.getDate() + '_' + date.getHours() + '.' + date.getMinutes() + '.' + date.getSeconds(),
-            urankState = _this.urank.getCurrentState();
+            urankState = _this.urank.getCurrentState(),
+            gf = $('#select-download').val() == '2files' ?
+                [{ filename: 'urank_selected_keywords_' + timestamp + '.txt', content: JSON.stringify(urankState.selectedKeywords) },
+                    { filename: 'urank_ranking_' + timestamp + '.txt', content: JSON.stringify(urankState.ranking) }] :
+                [{ filename: 'urank_state_' + timestamp + '.txt', content: JSON.stringify(urankState) }];
 
-        if($('#select-download').val() == '2files'){
-
-            $.generateFile({
-                filename: 'urank_selected_keywords_' + timestamp + '.txt',
-                content	: JSON.stringify(urankState.selectedKeywords),
-                script	: scriptURL
-            });
-
-            $.generateFile({
-                filename: 'urank_ranking_' + timestamp + '.txt',
-                content	: JSON.stringify(urankState.ranking),
-                script	: scriptURL
-            });
-        }
-        else {
-            $.generateFile({
-                filename: 'urank_state_' + timestamp + '.txt',
-                content	: JSON.stringify(urankState),
-                script	: scriptURL
-            });
-        }
+        gf.forEach(function(f){
+            $.generateFile({ filename: f.filename, content: f.content, script: scriptURL });
+        });
 
         event.preventDefault();
     };
