@@ -98,18 +98,18 @@ module.exports = function (grunt) {
   ]);
 
 
-  grunt.registerTask('urank-load', [
-      'bower-install-simple',
-      'bowercopy:urank',
-      'injector:urank'
-  ]);
-
-
-  grunt.registerTask('urank-load-and-copy-all', [
+  grunt.registerTask('urank-copy-and-load-all', [
       'bower-install-simple:urank',
       'bowercopy:urank',
       'bowercopy:urank_dep',
       'wiredep:indirect'
+  ]);
+
+
+  grunt.registerTask('urank-copy-and-load', [
+      'bower-install-simple',
+      'bowercopy:urank',
+      'injector:urank'
   ]);
 
   grunt.registerTask('urank-copy', [
