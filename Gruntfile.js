@@ -93,14 +93,6 @@ module.exports = function (grunt) {
           },
           urank: {
               files: {
-                  '<%= config.htmlFile %>': ['<%= config.libs %>/urank/**/*.js',
-                                             '<%= config.libs %>/urank/**/*.css',
-                                             '!<%= config.libs %>/urank/dependencies/**/*.js',
-                                             '!<%= config.libs %>/urank/dependencies/**/*.css']
-              }
-          },
-          urank_all: {
-              files: {
                   '<%= config.htmlFile %>': ['<%= config.libs %>/urank/**/*.js', '<%= config.libs %>/urank/**/*.css']
               }
           }
