@@ -36,33 +36,18 @@ module.exports = function (grunt) {
     // Project settings
     config: config,
 
+
    'bower-install-simple': {
+       options: {
+           forceLatest: true
+       },
        urank: {}
    },
-    // Automatically inject Bower components into the HTML file
-    wiredep: {
-      urank: {
-        src: ['<%= config.htmlFile %>'],
-        overrides: {
-            hint: {
-                main: "dist/hint.min.css"
-            },
-            'jquery-ui': {
-                main: [
-                    "jquery-ui.min.js",
-                    "themes/base/jquery-ui.min.css"
-                ]
-            }
-        }
-      }
-    },
-
 
     bowercopy: {
         options: {
-            srcPrefix: 'bower_components',
-            clean: true,       // to clean bower_components folder after moving necessary files, change this flag to true
-            ignore: ['*bower.json']
+            runBower: false,
+            clean: true      // to clean bower_components folder after moving necessary files, change this flag to true
         },
         urank: {
             src: 'urank',
@@ -70,66 +55,61 @@ module.exports = function (grunt) {
         },
         urank_dep: {
             options: {
-                destPrefix: '<%= config.libs %>/urank/dependencies'
+                destPrefix: '<%= config.libs %>'
             },
             files: {
-                'colorbrewer.js': 'colorbrewer/colorbrewer.js',
-                'd3.min.js': 'd3/d3.min.js',
-                'd3pie.min.js': 'd3pie/d3pie/d3pie.min.js',
-                'hint.min.css': 'hint/dist/hint.min.css',
-                'jquery.min.js': 'jquery/dist/jquery.min.js',
-                'jquery.min.map': 'jquery/dist/jquery.min.map',
-                'jquery-ui.min.js': 'jquery-ui/jquery-ui.min.js',
-                'theme/jquery-ui.min.css': 'jquery-ui/themes/base/jquery-ui.min.css',
-                'theme/images': 'jquery-ui/themes/base/images',
-                'underscore-min.js': 'underscore/underscore-min.js',
-                'underscore-min.map': 'underscore/underscore-min.map'
+                'colorbrewer': 'colorbrewer',
+                'd3': 'd3',
+                'd3pie': 'd3pie',
+                'hint.css': 'hint.css',
+                'jquery': 'jquery',
+                'jquery-ui': 'jquery-ui',
+                'underscore': 'underscore'
             }
         }
-    },
 
-    injector: {
+    },
+    // Automatically inject Bower components into the HTML file
+    wiredep: {
         options: {
-            min: true
-        },
-        urank: {
-            files: {
-                '<%= config.htmlFile %>': ['<%= config.libs %>/urank/**/*.js',
-                                            '<%= config.libs %>/urank/**/*.css',
-                                            '!<%= config.libs %>/urank/dependencies/**/*.js',
-                                            '!<%= config.libs %>/urank/dependencies/**/*.css']
+            overrides: {
+                'jquery-ui': {
+                    main: [ "jquery-ui.min.js", "themes/base/jquery-ui.min.css" ]
+                }
             }
         },
-        urank_all: {
-            files: {
-                '<%= config.htmlFile %>': ['<%= config.libs %>/urank/**/*.js', '<%= config.libs %>/urank/**/*.css']
-            }
-        }
-    }
+        direct: {
+            src: ['<%= config.htmlFile %>'],
+        },
+        indirect: {
+            directory: '<%= config.libs %>',
+            src: ['<%= config.htmlFile %>']
+          }
+      }
 
   });
 
 
 //  Register urank tasks
 
-  grunt.registerTask('urank-wiredep', [
+  grunt.registerTask('urank-load-all', [
       'bower-install-simple:urank',
-      'wiredep:urank'
+      'wiredep:direct'
   ]);
 
 
   grunt.registerTask('urank-load', [
-      'bower-install-simple:urank',
+      'bower-install-simple',
       'bowercopy:urank',
       'injector:urank'
   ]);
 
 
-  grunt.registerTask('urank-load-all', [
+  grunt.registerTask('urank-load-and-copy-all', [
       'bower-install-simple:urank',
       'bowercopy:urank',
       'bowercopy:urank_dep',
-      'injector:urank_all'
+      'wiredep:indirect'
   ]);
 
   grunt.registerTask('urank-copy', [
