@@ -7,6 +7,9 @@ window.RS = (function(){
 
         _this = this;
         this.bookmarks = [];
+        this.userItemMatrix = {};
+        this.itemTagMatrix = {};
+        this.userTagMatrix = {};
 
         var kw_aux = [
             { query: 'women in workforce', keywords: ['participation&women&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},
@@ -19,23 +22,58 @@ window.RS = (function(){
             result["tasks-results"].forEach(function(task) {
                 task["questions-results"].forEach(function(question) {
                     question["selected-items"].forEach(function(item) {
-                        _this.bookmarks.push({
+
+                         _this.bookmarks.push({
                             user_id: 'user_' + result.user,
                             doc_id: item.id,
                             doc_title: item.title,
-                            keywords: getKeywords(task.query, question["question-number"], kw_aux)
+                            keywords: getKeywords(task.query, question["question-number"])
                         });
                     });
                 });
 
             });
         });
-        console.log(this.bookmarks.length + ' bookarks retrievd');
+      //  console.log(this.bookmarks.length + ' bookarks retrievd');
 
-        function getKeywords(query, questionNumber, kw_aux) {
+        function getKeywords(query, questionNumber) {
             var index = _.findIndex(kw_aux, function(kw){ return kw.query == query });
             return kw_aux[index].keywords[questionNumber - 1].split('&');
         }
+
+
+        evaluationResults().forEach(function(r){
+            r['tasks-results'].forEach(function(t){
+                t['questions-results'].forEach(function(q){
+                    q['selected-items'].forEach(function(d){
+
+                        if(!_this.userItemMatrix[r.user])
+                            _this.userItemMatrix[r.user] = {};
+
+                        _this.userItemMatrix[r.user][d.id] = true;
+
+                        if(!_this.itemTagMatrix[d.title])
+                            _this.itemTagMatrix[d.title] = {};
+
+                        if(!_this.userTagMatrix[r.user])
+                            _this.userTagMatrix[r.user] = {};
+
+                        //  get used keywords
+                        getKeywords(t.query, q['question-number']).forEach(function(k){
+                            _this.itemTagMatrix[d.title][k] = (!_this.itemTagMatrix[d.title][k]) ? 1 : _this.itemTagMatrix[d.title][k] + 1;
+                            _this.userTagMatrix[r.user][k] = (!_this.userTagMatrix[r.user][k]) ? 1 : _this.userTagMatrix[r.user][k] + 1;
+                        });
+                    });
+                });
+            });
+        });
+
+
+        console.log('ITEM-TAG MATRIX');
+        console.log(_this.itemTagMatrix);
+        console.log('USER-TAG MATRIX');
+        console.log(_this.userTagMatrix);
+
     }
 
 

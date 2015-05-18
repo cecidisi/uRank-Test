@@ -49,7 +49,7 @@
 
     this.RS = new RS();
 
-    console.log(this.RS.getDocumentsForKeywords({user_id: 'new', keywords: ['human', 'robot', 'interaction']}));
+   // console.log(this.RS.getDocumentsForKeywords({user_id: 'new', keywords: ['human', 'robot', 'interaction']}));
 
 
     // uRank initialization function to be passed as callback
