@@ -2,77 +2,82 @@ window.RS = (function(){
 
     var _this;
 
+    function randomFromTo(from, to){
+        return Math.floor(Math.random() * (to - from + 1) + from);
+    }
+
+    function shuffle(o) {
+        for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+        return o;
+    }
 
     function RS() {
 
         _this = this;
-        this.bookmarks = [];
-        this.userItemMatrix = {};
-        this.itemTagMatrix = {};
-        this.userTagMatrix = {};
+        this.userItemMatrix = {};       //  boolean values
+        this.itemTagMatrix = {};        //  counts repetitions
+        this.userTagMatrix = {};        //  counts repetitions
+        this.tagMaxMatrix = {};
 
         var kw_aux = [
-            { query: 'women in workforce', keywords: ['participation&women&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},
-            { query: 'robot', keywords: ['autonomous&robot', 'human&interaction&robot', 'control&information&robot&sensor']},
-            { query: 'augmented reality', keywords: ['environment&virtual', 'context&object&recognition', 'augmented&environment&image&reality&video&world']},
-            { query: 'circular economy', keywords: ['management&waste', 'china&industrial&symbiosis', 'circular&economy&fossil&fuel&system&waste']}];
-
-        evaluationResults().forEach(function(result){
-
-            result["tasks-results"].forEach(function(task) {
-                task["questions-results"].forEach(function(question) {
-                    question["selected-items"].forEach(function(item) {
-
-                         _this.bookmarks.push({
-                            user_id: 'user_' + result.user,
-                            doc_id: item.id,
-                            doc_title: item.title,
-                            keywords: getKeywords(task.query, question["question-number"])
-                        });
-                    });
-                });
-
-            });
-        });
-      //  console.log(this.bookmarks.length + ' bookarks retrievd');
+            { query: 'women in workforce', keywords: ['participation&woman&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},       // 9
+            { query: 'robot', keywords: ['autonomous&robot', 'human&interaction&robot', 'control&information&robot&sensor']},                                   // 7
+            { query: 'augmented reality', keywords: ['environment&virtual', 'context&object&recognition', 'augmented&environment&image&reality&video&world']},  // 10
+            { query: 'circular economy', keywords: ['management&waste', 'china&industrial&symbiosis', 'circular&economy&fossil&fuel&system&waste']}];           // 10
 
         function getKeywords(query, questionNumber) {
             var index = _.findIndex(kw_aux, function(kw){ return kw.query == query });
             return kw_aux[index].keywords[questionNumber - 1].split('&');
         }
 
-
-        evaluationResults().forEach(function(r){
+        evaluationResults.forEach(function(r, i){
             r['tasks-results'].forEach(function(t){
-                t['questions-results'].forEach(function(q){
+                t['questions-results'].forEach(function(q, j){
+                    var keywords = getKeywords(t.query, q['question-number']);
+                    var user = (r.user - 1) * 3 + q['question-number'];
+                    //console.log('user #' + user + '  ---  r.user = ' + r.user + ', question number = ' + q["question-number"]);
+
                     q['selected-items'].forEach(function(d){
 
-                        if(!_this.userItemMatrix[r.user])
-                            _this.userItemMatrix[r.user] = {};
+                        if(!_this.userItemMatrix[user])
+                            _this.userItemMatrix[user] = {};
 
-                        _this.userItemMatrix[r.user][d.id] = true;
+                        _this.userItemMatrix[user][d.id] = true;
 
-                        if(!_this.itemTagMatrix[d.title])
-                            _this.itemTagMatrix[d.title] = {};
+                        if(!_this.itemTagMatrix[d.id])
+                            _this.itemTagMatrix[d.id] = {};
 
-                        if(!_this.userTagMatrix[r.user])
-                            _this.userTagMatrix[r.user] = {};
+                        if(!_this.userTagMatrix[user])
+                            _this.userTagMatrix[user] = {};
 
-                        //  get used keywords
-                        getKeywords(t.query, q['question-number']).forEach(function(k){
-                            _this.itemTagMatrix[d.title][k] = (!_this.itemTagMatrix[d.title][k]) ? 1 : _this.itemTagMatrix[d.title][k] + 1;
-                            _this.userTagMatrix[r.user][k] = (!_this.userTagMatrix[r.user][k]) ? 1 : _this.userTagMatrix[r.user][k] + 1;
+                        var usedKeywords = shuffle(keywords).slice(0, randomFromTo(2,keywords.length));
+                       // console.log(usedKeywords);
+                        usedKeywords.forEach(function(k){
+                            _this.itemTagMatrix[d.id][k] = (!_this.itemTagMatrix[d.id][k]) ? 1 : _this.itemTagMatrix[d.id][k] + 1;
+                            _this.userTagMatrix[user][k] = (!_this.userTagMatrix[user][k]) ? 1 : _this.userTagMatrix[user][k] + 1;
                         });
                     });
                 });
             });
         });
 
+        //  Get max p(d, k)
+        _.values(this.itemTagMatrix).forEach(function(docTags){
+            _.keys(docTags).forEach(function(tag){
+                if(!_this.tagMaxMatrix[tag] || docTags[tag] > _this.tagMaxMatrix[tag])
+                    _this.tagMaxMatrix[tag] = docTags[tag];
+            });
+        });
 
-        console.log('ITEM-TAG MATRIX');
-        console.log(_this.itemTagMatrix);
-        console.log('USER-TAG MATRIX');
-        console.log(_this.userTagMatrix);
+        console.log('USER-ITEM MATRIX (' + _.size(_this.userItemMatrix) + ')');
+        console.log(_this.userItemMatrix);
+        console.log(JSON.stringify(_this.userItemMatrix));
+//        console.log('ITEM-TAG MATRIX (' + _.size(_this.itemTagMatrix) + ')');
+//        console.log(_this.itemTagMatrix);
+//        console.log('USER-TAG MATRIX (' + _.size(_this.userTagMatrix) + ')');
+//        console.log(_this.userTagMatrix);
+//        console.log('TAG-MAX MATRIX (' + _.size(_this.tagMaxMatrix) + ')');
+//        console.log(_this.tagMaxMatrix);
 
     }
 
@@ -81,83 +86,68 @@ window.RS = (function(){
     RS.prototype = {
 
         addBookmark: function(args) {
-            var b = $.extend({ user_id: undefined, doc_id: undefined, doc_title: undefined, keywords: undefined }, args);
+            var p = $.extend({ user: undefined, doc: undefined, keywords: undefined }, args);
 
-            if(b.user_id == undefined || b.doc_id == undefined || b.doc_title == undefined || b.keywords == undefined)
+            if(p.user == undefined || p.doc == undefined || p.keywords == undefined)
                 return 'Error -- parameter missing';
 
-            this.bookmarks.push(b);
-            return 'Success';
+            //  update user-item matrix
+           if(!_this.userItemMatrix[p.user])
+               _this.userItemMatrix[p.user] = {};
+
+            _this.userItemMatrix[p.user][p.doc] = true;
+
+            if(!_this.itemTagMatrix[p.doc])
+                _this.itemTagMatrix[p.doc] = {};
+
+            if(!_this.userTagMatrix[p.user])
+                _this.userItemMatrix[p.user] = {};
+
+            // update item-tag, user-tag and tagMax matrices
+            p.keywords.forEach(function(k){
+                _this.itemTagMatrix[p.doc][k.term] = (!_this.itemTagMatrix[p.doc][k.term]) ? 1 : _this.itemTagMatrix[p.doc][k.term] + 1;
+                _this.userTagMatrix[p.user][k.term] = (!_this.userTagMatrix[p.user][k.term]) ? 1 : _this.userTagMatrix[p.user][k.term] + 1;
+
+                if(!_this.tagMaxMatrix[k.term] || _this.itemTagMatrix[p.doc][k.term] > _this.tagMaxMatrix[k.term])
+                    _this.tagMaxMatrix[k.term] = _this.itemTagMatrix[p.doc][k.term];
+            });
+
+            return 'success';
         },
 
-        getDocumentsForKeywords: function(args) {
+        getRecommendationsForKeywords: function(args) {
 
             var p = $.extend({
-                user_id: 'new',
+                user: 'new',
                 keywords: []
             }, args);
 
-            var bookmarkedByUser = {},
-                bookmakedByOthers = {},
-                recs = {}, recSet = {};
-
-            var bookmarksDict = _.groupBy(this.bookmarks, function(b){ return b.doc_id });
-
-            this.bookmarks.forEach(function(b){
-                if(b.user_id == p.user_id)      //  delete docs bookmarked by current user
-                    delete bookmarksDict[b.doc_id];
-            });
-
-            console.log(bookmarksDict);
-
-            function getKeywordString(keywordArray) {
-                return _.sortBy(keywordArray, function(term){ return term; }).join('+');
-            }
-
-
-            _.each(_.keys(bookmarksDict), function(doc){
-
-
-
-            })
-
-
-
-
-
-/*            _.each(_.keys(bookmarksDict), function(doc){
-                recs[doc] = { total: 0, keywords: {} };
-
-                _.each(bookmarksDict[doc], function(b){
-                    var keywordsIn = [];
-                    _.each(p.keywords, function(k){
-                        if(_.contains(b.keywords, k))
-                            keywordsIn.push(k);
+            var recs = [];
+            _.keys(_this.itemTagMatrix).forEach(function(d){
+                if(!_this.userItemMatrix[p.user] || !_this.userItemMatrix[p.user][d]){
+                    var acum = 0, tags = {};
+                    p.keywords.forEach(function(k){
+                        if(_this.itemTagMatrix[d][k.term]) {
+                            var pPrime = _this.itemTagMatrix[d][k.term] / _this.tagMaxMatrix[k.term];
+                            var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.itemTagMatrix[d][k.term])));
+                            var tagScore = (pPrime * k.weight * scalingFactor / p.keywords.length).round(3);
+                            tags[k.term] = { tagged: _this.itemTagMatrix[d][k.term], score: tagScore };
+                            acum += tagScore;
+                        }
                     });
 
-                    if(keywordsIn.length > 0) {
-                        recs[doc].total++;
-                        var flagNew = false;
-                        if(!recs[doc].keywords[keywordsIn.length]) {
-                            recs[doc].keywords[keywordsIn.length] = [];
-                            flagNew = true;
-                        }
-
-                        var i = flagNew ? -1 : _.findIndex(recs[doc].keywords[keywordsIn.length], function(kwSet){ return kwSet.terms == getKeywordString(keywordsIn) });
-                        if(i == -1)
-                            recs[doc].keywords[keywordsIn.length].push({ count: 1, terms:getKeywordString(keywordsIn) });
-                        else
-                            recs[doc].keywords[keywordsIn.length][i].count++;
-
+                    if(acum) {
+                        recs.push({ doc_id: d, score: acum.round(3), tags: tags });
                     }
-                });
-                if(recs[doc].total == 0)
-                    delete recs[doc];
-            })*/
 
-            console.log(_.size(recs));
+                }
 
-
+            });
+            recs = recs.sort(function(r1, r2){
+                if(r1.score > r2.score) return -1;
+                if(r1.score < r2.score) return 1;
+                return 0;
+            });
 
             return recs;
         }

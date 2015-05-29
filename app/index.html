@@ -9,6 +9,7 @@
         <!-- bower:css -->
         <link rel="stylesheet" href="../bower_components/jquery-ui/themes/base/jquery-ui.min.css" />
         <link rel="stylesheet" href="../bower_components/hint.css/hint.min.css" />
+        <link rel="stylesheet" href="../bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" />
         <link rel="stylesheet" href="../bower_components/urank/css/urank.css" />
         <link rel="stylesheet" href="../bower_components/urank/css/urank-blocks-default.css" />
         <link rel="stylesheet" href="../bower_components/urank/css/vis-ranking.css" />
@@ -24,43 +25,43 @@
         <header>                            <!-- top panel -->
             <select id="select-dataset"></select>
             <select id="select-download">
-                <option value="2files">Keyword &amp; ranking in 2 files</option>
-                <option value="1file">All in 1 file</option>
+                <option value="all">All (3 files)</option>
+                <option value="ranking">Ranking</option>
+                <option value="keywords">Keywords</option>
+                <option value="recs">Recommendations</option>
             </select>
             <input type="button" id="btn-download" value="Download"/>
       	</header>
 
         <div class="main-panel">
 
-            <div id="tagcloud"></div>       <!-- left panel -->
+            <div id="tagcloud"></div>
 
-            <div class="central-panel">     <!-- central panel, including list and ranking -->
+            <div class="central-left-panel">
 
-                <div class="control-panel">
-                    <div class="ranking-controls">
-                        <button id="btn-reset" title="Reset">
-                            <span class="sprite-reset"></span>
-                        </button>
-                        <button id="btn-sort-by-overall-score" title="Sort by overall score">
-                            <span class="sprite-sort-down"></span>
-                        </button>
-                        <button id="btn-sort-by-max-score" title="Sort by maximum score">
-                            <span class="sprite-wiggle"></span>
-                        </button>
-                    </div>
-
-                    <div id="tagbox"></div>
-
+                <!--<div class="control-panel">-->
+                <div class="ranking-controls">
+                    <button id="btn-reset" title="Reset">
+                        <span class="sprite-reset"></span>
+                    </button>
+                    <button id="btn-sort-by-overall-score" title="Sort by overall score">
+                        <span class="sprite-sort-down"></span>
+                    </button>
+                    <button id="btn-sort-by-max-score" title="Sort by maximum score">
+                        <span class="sprite-wiggle"></span>
+                    </button>
                 </div>
+                <div id="contentlist" ></div>
 
-                <div class="vis-panel">
-                    <div id="contentlist" ></div>
-                    <div id="viscanvas"></div>
-                </div>
+
+            </div>
+            <div class="central-right-panel">
+                <div id="tagbox"></div>
+                <div id="viscanvas"></div>
             </div>
             <div id="docviewer"></div>      <!-- right panel -->
 
-		</div>
+        </div>
 
         <div class="processing-message">Processing Data...</div>
 
@@ -72,6 +73,10 @@
         <script src="../bower_components/d3pie/d3pie/d3pie.min.js"></script>
         <script src="../bower_components/underscore/underscore.js"></script>
         <script src="../bower_components/jquery-ui/jquery-ui.min.js"></script>
+        <script src="../bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+        <script src="../bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
+        <script src="../bower_components/velocity/velocity.js"></script>
+        <script src="../bower_components/velocity/velocity.ui.js"></script>
         <script src="../bower_components/urank/libs/natural-custom.js"></script>
         <script src="../bower_components/urank/libs/pos/lexer.js"></script>
         <script src="../bower_components/urank/libs/pos/lexicon.js"></script>
@@ -85,7 +90,8 @@
         <script src="../bower_components/urank/blocks/tagBox.js"></script>
         <script src="../bower_components/urank/blocks/tagCloud.js"></script>
         <script src="../bower_components/urank/blocks/visCanvas.js"></script>
-        <script src="../bower_components/urank/vis/ranking.js"></script>
+        <script src="../bower_components/urank/modules/tagcloud/tagCloudDefault.js"></script>
+        <script src="../bower_components/urank/modules/viscanvas/ranking.js"></script>
         <script src="../bower_components/urank/helper/globals.js"></script>
         <script src="../bower_components/urank/helper/settings.js"></script>
         <script src="../bower_components/urank/helper/utils.js"></script>

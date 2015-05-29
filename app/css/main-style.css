@@ -154,40 +154,31 @@ header select, header input[type="button"]{
 
 /***************************************************************************************************/
 
-
 .main-panel {
-	display: inline-flex;
+    display: inline-flex;
     justify-content: space-between;
     width: 100%;
-	height: calc(100% - 6em);
+    height: calc(100% - 6em);
     text-align: center;
-	vertical-align: top;
+    vertical-align: top;
 }
 
-
+/*  LEFT    */
 
 #tagcloud {
     float: left;
-    width: 17%;
-    height: calc(100% - 25px);
-}
-
-
-
-.central-panel {
-    display: inline-block;
-    width: 61%;
+    width: 18%;
     height: 100%;
 }
 
 
-.control-panel {
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: stretch;
-    width: 100%;
-    height: 9%;
-    min-height: 4.5em;
+/*  CENTER-LEFT */
+
+.central-left-panel {
+    display: inline-block;
+    float:  left;
+    width: 30%;
+    height: 100%;
 }
 
 
@@ -197,10 +188,12 @@ header select, header input[type="button"]{
 */
 
 .ranking-controls {
-	display: inline-flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45%;
+    /*width: 45%;*/
+    width: 100%;
+    height: 5em;
     background: -webkit-linear-gradient(top, rgba(245, 245, 245, 1), rgba(230, 230, 230, 1));
     box-shadow: inset .1em .1em .5em #ccc, inset -.1em -.1em .5em #ccc;
 }
@@ -243,13 +236,54 @@ header select, header input[type="button"]{
 }
 
 
+
+#contentlist {
+    float: left;
+    width: 100%;
+    height: calc(100% - 5em);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+
+/*  CENTER-RIGHT */
+
+.central-right-panel {
+    display: inline-block;
+    float:  left;
+    width: 31%;
+    height: 100%;
+}
+
 /*
 *   Tagbox (upper mid-right header)
 */
 #tagbox {
     float: right;
-    width: 55%;
+    width: 100%;
+    height: 5em;
 }
+
+
+#viscanvas {
+    float: right;
+    width: 100%;
+    height: calc(100% - 5em);
+}
+/*.control-panel {
+display: inline-flex;
+justify-content: space-between;
+align-items: stretch;
+width: 100%;
+height: 4em;
+min-height: 4.5em;
+}*/
+
+
+
+
+
 
 
 
@@ -258,21 +292,15 @@ header select, header input[type="button"]{
 .vis-panel {
     display: inline-block;
     width: 100%;
-    height: 90%;
-    overflow-y: auto;
+    height: calc(100% - 4em);
+    overflow-y: hidden;
     overflow-x: hidden;
 }
 
-#contentlist {
-    float: left;
-    width: 45%;
-}
 
 
-#viscanvas {
-    width: 55%;
-    min-height: 99%;
-}
+
+
 
 
 
@@ -283,10 +311,8 @@ header select, header input[type="button"]{
     flex-direction: column;
     float: right;
     width: 21%;
-    height: calc(100% - 9px);
-    padding: .5em;
+    height: 100%;
 }
-
 
 /***************************************************************************************************/
 

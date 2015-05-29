@@ -1,8 +1,9 @@
 (function(){
 
     var _this = this;
+    this.currentRecs = [];
     this.dsm = new datasetManager();
-    this.currentRanking = {};
+    this.RS = new RS();
 
 
     // Event handler for dataset-select change
@@ -20,21 +21,45 @@
 
     //  Event handler for "Download ranking" button
     var btnDownloadClicked = function(event) {
+        event.preventDefault();
 
         var scriptURL = '../server/download.php',
             date = new Date(),
             timestamp = date.getFullYear() + '-' + (parseInt(date.getMonth()) + 1) + '-' + date.getDate() + '_' + date.getHours() + '.' + date.getMinutes() + '.' + date.getSeconds(),
             urankState = _this.urank.getCurrentState(),
-            gf = $('#select-download').val() == '2files' ?
-                [{ filename: 'urank_selected_keywords_' + timestamp + '.txt', content: JSON.stringify(urankState.selectedKeywords) },
-                    { filename: 'urank_ranking_' + timestamp + '.txt', content: JSON.stringify(urankState.ranking) }] :
-                [{ filename: 'urank_state_' + timestamp + '.txt', content: JSON.stringify(urankState) }];
+            fileOptions = {
+                all: [
+                    { filename: 'urank_selected_keywords_' + timestamp + '.txt', content: JSON.stringify(urankState.selectedKeywords) },
+                    { filename: 'urank_ranking_' + timestamp + '.txt', content: JSON.stringify(urankState.ranking) },
+                    { filename: 'urank_recommendations_' + timestamp + '.txt', content: JSON.stringify(_this.currentRecs) }
+                ],
+                ranking: [
+                    { filename: 'urank_selected_keywords_' + timestamp + '.txt', content: JSON.stringify(urankState.selectedKeywords) }
+                ],
+                keywords: [
+                    { filename: 'urank_ranking_' + timestamp + '.txt', content: JSON.stringify(urankState.ranking) }
+                ],
+                recs: [
+                    { filename: 'urank_recommendations_' + timestamp + '.txt', content: JSON.stringify(_this.currentRecs) }
+                ]
+            };
 
-        gf.forEach(function(f){
+        fileOptions[$('#select-download').val()].forEach(function(f){
             $.generateFile({ filename: f.filename, content: f.content, script: scriptURL });
         });
+    };
 
-        event.preventDefault();
+    //  uRank callbacks
+    var onUrankChange = function(rankingData, selectedKeywords) {
+        console.log('Testing Recommender');
+        _this.currentRecs =RS.getRecommendationsForKeywords({ keywords: selectedKeywords });
+        console.log(_this.currentRecs);
+    };
+
+    var onFaviconClicked = function(documentId){
+
+
+
     };
 
 
@@ -44,12 +69,9 @@
         tagBoxRoot: '#tagbox',
         contentListRoot: '#contentlist',
         visCanvasRoot: '#viscanvas',
-        docViewerRoot: '#docviewer'
+        docViewerRoot: '#docviewer',
+        onChange: onUrankChange
     };
-
-    this.RS = new RS();
-
-   // console.log(this.RS.getDocumentsForKeywords({user_id: 'new', keywords: ['human', 'robot', 'interaction']}));
 
 
     // uRank initialization function to be passed as callback

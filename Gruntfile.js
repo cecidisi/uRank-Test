@@ -41,7 +41,12 @@ module.exports = function (grunt) {
        options: {
            forceLatest: true
        },
-       urank: {}
+       'urank-install': {},
+       'urank-update': {
+            options: {
+                update: true
+            }
+       }
    },
 
     bowercopy: {
@@ -102,15 +107,16 @@ module.exports = function (grunt) {
 
 
 //  Register urank tasks
+    /*  INSTALL  */
 
   grunt.registerTask('urank-load-all', [
-      'bower-install-simple:urank',
+      'bower-install-simple:urank-install',
       'wiredep:direct'
   ]);
 
 
   grunt.registerTask('urank-copy-and-load-all', [
-      'bower-install-simple:urank',
+      'bower-install-simple:urank-install',
       'bowercopy:urank',
       'bowercopy:urank_dep',
       'wiredep:indirect'
@@ -118,20 +124,27 @@ module.exports = function (grunt) {
 
 
   grunt.registerTask('urank-copy-and-load', [
-      'bower-install-simple',
+      'bower-install-simple:urank-install',
       'bowercopy:urank',
       'injector:urank'
   ]);
 
   grunt.registerTask('urank-copy', [
-      'bower-install-simple:urank',
+      'bower-install-simple:urank-install',
       'bowercopy:urank',
   ]);
 
   grunt.registerTask('urank-copy-all', [
-      'bower-install-simple:urank',
+      'bower-install-simple:urank-install',
       'bowercopy:urank',
       'bowercopy:urank_dep',
   ]);
+
+
+    /*  UPDATE  */
+    grunt.registerTask('urank-update-all', [
+        'bower-install-simple:urank-update',
+        'wiredep:direct'
+    ]);
 
 };
