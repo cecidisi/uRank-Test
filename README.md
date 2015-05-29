@@ -11,6 +11,8 @@ Gruntfile.js sets a config object with 3 paths:
   * 'libs': folder where you wanna copy urank (see options 2 and 3), and 
   * 'htmlFile': path to file where you wan t to inject urank files and dependencies (here `app/index.html`)
 
+Before runing any of the following grunt tasks, execute the command `bower cache clean`
+
 There are 3 ways of downloading urank and including necessary files in you HTML:
   1. To downlaod urank to `bower_components` and include urank and dependencies directly from this folder, run: 
     ```grunt urank-load-all``` (recommended)
