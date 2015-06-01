@@ -1,0 +1,53 @@
+.settings {
+    width: 100%;
+    display: inline-block;
+}
+
+.settings .inner {
+    padding: 5px;
+    display: inline;
+}
+
+.results-container {
+    margin: 20px 50px;
+    height: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: inline-block;
+}
+
+.results-container a {
+    float: right;
+    margin-right: 10px;
+    display: none;
+}
+
+.spinner {
+    background-image: url(media/spinner.gif);
+    display: none;
+    width: 24px;
+    height: 24px;
+}
+
+
+table {
+    margin-right: 30px;
+    width: 100%;
+}
+
+table th {
+    color: white;
+    background-color: blue;
+    min-width: 50px;
+}
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+table td {
+    min-width: 50px;
+}

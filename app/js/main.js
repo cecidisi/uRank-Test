@@ -1,9 +1,53 @@
 (function(){
 
     var _this = this;
-    this.currentRecs = [];
-    this.dsm = new datasetManager();
-    this.RS = new RS();
+
+    //  Prepare recommender data
+    function addDataToRecommender() {
+
+        var kw_aux = [
+            { query: 'women in workforce', keywords: ['participation&woman&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},       // 9
+            { query: 'robot', keywords: ['autonomous&robot', 'human&interaction&robot', 'control&information&robot&sensor']},                                   // 7
+            { query: 'augmented reality', keywords: ['environment&virtual', 'context&object&recognition', 'augmented&environment&image&reality&video&world']},  // 10
+            { query: 'circular economy', keywords: ['management&waste', 'china&industrial&symbiosis', 'circular&economy&fossil&fuel&system&waste']}];           // 10
+
+        function getKeywords(query, questionNumber) {
+            var index = _.findIndex(kw_aux, function(kw){ return kw.query == query });
+            return kw_aux[index].keywords[questionNumber - 1].split('&');
+        }
+
+        function randomFromTo(from, to){
+            return Math.floor(Math.random() * (to - from + 1) + from);
+        }
+
+        function shuffle(o) {
+            for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+            return o;
+        }
+
+        var recData = [];
+
+        evaluationResults.forEach(function(r, i){
+            r['tasks-results'].forEach(function(t){
+                t['questions-results'].forEach(function(q, j){
+                    var keywords = getKeywords(t.query, q['question-number']);
+                    var user = (r.user - 1) * 3 + q['question-number'];
+
+                    q['selected-items'].forEach(function(d){
+                        var usedKeywords = shuffle(keywords).slice(0, randomFromTo(2,keywords.length));
+
+                        recData.push({ user: user, doc: d.id, keywords: usedKeywords });
+                    });
+                });
+            });
+        });
+
+        //  add all evaluation results to recommender
+        recData.forEach(function(d){
+            _this.RS.addBookmark(d);
+        });
+    }
+
 
 
     // Event handler for dataset-select change
@@ -52,14 +96,11 @@
     //  uRank callbacks
     var onUrankChange = function(rankingData, selectedKeywords) {
         console.log('Testing Recommender');
-        _this.currentRecs =RS.getRecommendationsForKeywords({ keywords: selectedKeywords });
+        _this.currentRecs = _this.RS.getRecommendationsForKeywords({ keywords: selectedKeywords });
         console.log(_this.currentRecs);
     };
 
     var onFaviconClicked = function(documentId){
-
-
-
     };
 
 
@@ -74,8 +115,14 @@
     };
 
 
-    // uRank initialization function to be passed as callback
+    //  INITIALIZATION
+    this.currentRecs = [];
+    this.dsm = new datasetManager();
     this.urank = new Urank(urankOptions);
+    this.RS = new RS();
+
+    addDataToRecommender();
+
 
     // Fill dataset select options and bind event handler
     var datasetOptions = "";

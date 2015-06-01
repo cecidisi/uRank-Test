@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>uRank Test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="rs-test.css" />
+        <link rel="stylesheet" href="../../app/css/main-style.css" />
+    </head>
+
+    <body>
+
+        <div class="settings">
+            <div class="inner">
+                <span>Runs: </span>
+                <select id="select-runs">
+                    <option value="1">1</option>
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <div class="inner">
+                <span>% Training data: </span>
+                <select id="select-pctg-training">
+                    <option value="60">60</option>
+                    <option value="70" selected>70</option>
+                    <option value="80">80</option>
+                </select>
+            </div>
+
+            <div class="inner">
+                <input type="button" id="btn-run" value="Run Test" />
+            </div>
+
+            <div class="inner">
+                <span id="runing-status"></span>
+<!--                <div id="spinner" class="spinner"></div>-->
+            </div>
+        </div>
+
+        <div class="results-container">
+            <span>Test Results</span>
+            <a id="download-results" href="#">Download</a>
+            <table id="results">
+                <thead>
+                    <tr>
+                        <th>Rec. Size</th>
+                        <th>#Run</th>
+                        <th>Recall</th>
+                        <th>Hits</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="results-container">
+            <span>Statistics</span>
+            <a id="download-stats" href="#">Download</a>
+            <table id="stats">
+                <thead>
+                    <tr>
+                        <th>Rec. Size</th>
+                        <th>Recall mean(stdv)</th>
+                        <th>Mean Hits</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+
+
+
+
+        <!--Bower scripts-->
+        <script src="../../bower_components/jquery/dist/jquery.js"></script>
+        <script src="../../bower_components/underscore/underscore.js"></script>
+
+        <!-- App scripts -->
+        <script type="text/javascript" src="../rs.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../../app/js/evaluation-results.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../../app/js/file-generator.js" charset="utf-8"></script>
+        <script type="text/javascript" src="rs-test.js" charset="utf-8"></script>
+    </body>
+</html>
