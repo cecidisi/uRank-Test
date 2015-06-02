@@ -19,7 +19,8 @@ window.RS = (function(){
         this.userItemMatrix = {};       //  boolean values
         this.itemTagMatrix = {};        //  counts repetitions
         this.userTagMatrix = {};        //  counts repetitions
-        this.maxTagAcrossDocs = {};
+        this.maxTagAcrossDocs = {};     //  highest frequency of each tag in a document. Depends on item-tag matrix
+        this.maxTagAccrossUsers = {};   //  highest frequency of each tag for a user. Depends on user-tag matrix
     }
 
 
@@ -37,9 +38,11 @@ window.RS = (function(){
 
             _this.userItemMatrix[p.user][p.doc] = true;
 
+            //  item-tag matrix
             if(!_this.itemTagMatrix[p.doc])
                 _this.itemTagMatrix[p.doc] = {};
 
+            //  user-tag-matrix
             if(!_this.userTagMatrix[p.user])
                 _this.userTagMatrix[p.user] = {};
 
@@ -50,44 +53,109 @@ window.RS = (function(){
 
                 if(!_this.maxTagAcrossDocs[k] || _this.itemTagMatrix[p.doc][k] > _this.maxTagAcrossDocs[k])
                     _this.maxTagAcrossDocs[k] = _this.itemTagMatrix[p.doc][k];
+
+                if(!_this.maxTagAccrossUsers[k] || _this.userTagMatrix[p.user][k] > _this.maxTagAccrossUsers[k])
+                    _this.maxTagAccrossUsers[k] = _this.userTagMatrix[p.user][k];
             });
             return 'success';
         },
 
-        getRecommendationsForKeywords: function(args) {
+        getRecommendations: function(args) {
 
-            var p = $.extend({
+            var p = $.extend(true, {
                 user: 'new',
                 keywords: [],
-                beta: 0.5
+                options: {
+                    beta: 0.5,
+                    neighborhoodSize: 30,
+                    and: false,
+                    recSize: 0
+                }
             }, args);
 
+            //  Get neighbors
+            var neighbors = [];
+
+            if(p.options.beta < 1) {
+                _.keys(_this.userTagMatrix).forEach(function(user){
+                    if(user != p.user) {
+                        var userScore = 0;
+                        p.keywords.forEach(function(k){
+                            if(_this.userTagMatrix[user][k.term]) {
+                                var normalizedFreq = _this.userTagMatrix[user][k.term] / _this.maxTagAccrossUsers[k.term];
+                                var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.userTagMatrix[user][k.term])));
+                                userScore += (normalizedFreq * k.weight * scalingFactor / p.keywords.length);
+                            }
+                        });
+                        if(userScore > 0)
+                            neighbors.push({ user: user, score: Math.roundTo(userScore, 3) });
+                    }
+                });
+
+                neighbors = neighbors.sort(function(u1, u2){
+                    if(u1.score > u2.score) return -1;
+                    if(u1.score < u2.score) return 1;
+                    return 0;
+                }).slice(0, p.options.neighborhoodSize);
+            }
+
             var recs = [];
-            _.keys(_this.itemTagMatrix).forEach(function(d){
-                if(!_this.userItemMatrix[p.user] || !_this.userItemMatrix[p.user][d]){
-                    var tagBasedScore = 0, tags = {};
-                    p.keywords.forEach(function(k){
-                        if(_this.itemTagMatrix[d][k.term]) {
-                            var pPrime = _this.itemTagMatrix[d][k.term] / _this.maxTagAcrossDocs[k.term];           // normalized item-tag frequency
-                            var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.itemTagMatrix[d][k.term])));   // raises final score of items bookmarked many times
-                            var tagScore = (pPrime * k.weight * scalingFactor / p.keywords.length);
-                            tags[k.term] = { tagged: _this.itemTagMatrix[d][k.term], score: tagScore };
-                            tagBasedScore += tagScore;
-                        }
-                    });
+            //   Keys are doc ids
+            _.keys(_this.itemTagMatrix).forEach(function(doc){
+                //  Checks that current user has not selected the doc yet
+                if(!_this.userItemMatrix[p.user] || !_this.userItemMatrix[p.user][doc]){
 
-                    if(tagBasedScore)
-                        recs.push({ doc: d, score: Math.roundTo(tagBasedScore, 3), tags: tags });
+                    var tagBasedScore = 0,
+                        userBasedScore = 0,
+                        tags = {}, users = 0;
 
+                    //  Compute tag-based score
+                    if(p.options.beta > 0) {
+                        p.keywords.forEach(function(k){
+                            if(_this.itemTagMatrix[doc][k.term]) {
+                                var normalizedFreq = _this.itemTagMatrix[doc][k.term] / _this.maxTagAcrossDocs[k.term];           // normalized item-tag frequency
+                                var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.itemTagMatrix[doc][k.term])));   // raises final score of items bookmarked many times
+                                var tagScore = (normalizedFreq * k.weight * scalingFactor / p.keywords.length);
+                                tags[k.term] = { tagged: _this.itemTagMatrix[doc][k.term], score: tagScore };
+                                tagBasedScore += tagScore;
+                            }
+                        });
+                    }
+
+                    //  compute user-based score => neighbor similarity * 1 | 0
+                    if(p.options.beta < 1) {
+                        neighbors.forEach(function(n){
+                            if(_this.userItemMatrix[n.user] && _this.userItemMatrix[n.user][doc]) {
+                                var userScore = (n.score / neighbors.length);
+                                userBasedScore += userScore;
+                                users++;
+                            }
+                        });
+                    }
+
+                    var finalScore = tagBasedScore * p.options.beta + userBasedScore * (1 - p.options.beta);
+                    if((p.options.and && userBasedScore > 0 && tagBasedScore > 0) || finalScore > 0)
+                        recs.push({
+                            doc: doc,
+                            score: Math.roundTo(finalScore, 3),
+                            misc: {
+                                tagBasedScore: tagBasedScore,
+                                userBasedScore: userBasedScore,
+                                tags: tags,
+                                users: users
+                            }
+                        });
                 }
-
             });
+
             recs = recs.sort(function(r1, r2){
                 if(r1.score > r2.score) return -1;
                 if(r1.score < r2.score) return 1;
                 return 0;
             });
-            return recs;
+
+            var size = p.options.recSize == 0 ? recs.length : p.options.recSize;
+            return recs.slice(0, size);
         },
 
         clear: function() {
@@ -95,10 +163,15 @@ window.RS = (function(){
             this.itemTagMatrix = {};
             this.userTagMatrix = {};
             this.maxTagAcrossDocs = {};
+            this.maxTagAccrossUsers = {};
         },
 
-        testRecommender: function(trainingData, testData, recSize) {
-            recSize = recSize || 5;
+        testRecommender: function(trainingData, testData, options) {
+            var o = $.extend({
+                recSize: 0,
+                beta: 0.5,
+                and: false,
+            }, options);
 
             this.clear();
 
@@ -114,7 +187,13 @@ window.RS = (function(){
             var hits = 0;
 
             testData.forEach(function(d){
-                var recs = _this.getRecommendationsForKeywords(d).slice(0, recSize);
+                var args = {
+                    user: d.user,
+                    keywords: d.keywords,
+                    options: o
+                };
+
+                var recs = _this.getRecommendations(args);
                 if(_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1)
                     hits++;
             });

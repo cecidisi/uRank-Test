@@ -96,7 +96,7 @@
     //  uRank callbacks
     var onUrankChange = function(rankingData, selectedKeywords) {
         console.log('Testing Recommender');
-        _this.currentRecs = _this.RS.getRecommendationsForKeywords({ keywords: selectedKeywords });
+        _this.currentRecs = _this.RS.getRecommendations({ keywords: selectedKeywords });
         console.log(_this.currentRecs);
     };
 

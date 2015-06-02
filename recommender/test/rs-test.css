@@ -1,6 +1,7 @@
 .settings {
     width: 100%;
     display: inline-block;
+    margin: 5px;
 }
 
 .settings .inner {
@@ -8,19 +9,12 @@
     display: inline;
 }
 
-.results-container {
-    margin: 20px 50px;
-    height: 90%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: inline-block;
+
+select[multiple="multiple"] {
+    width: 100px;
 }
 
-.results-container a {
-    float: right;
-    margin-right: 10px;
-    display: none;
-}
+/**/
 
 .spinner {
     background-image: url(media/spinner.gif);
@@ -28,6 +22,27 @@
     width: 24px;
     height: 24px;
 }
+
+.red {
+    color: red;
+}
+
+/*  table and container */
+
+.table-container {
+    margin: 20px;
+    height: 90%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: inline-block;
+}
+
+.table-container a {
+    float: right;
+    margin-right: 10px;
+    display: none;
+}
+
 
 
 table {
