@@ -40,13 +40,6 @@ span {
 }
 
 
-select {
-    font-size: 1em;
-    text-align: left;
-    border: 0.1em #ddd solid;
-}
-
-
 text {
     font-size: 0.85em;
 }
@@ -64,7 +57,19 @@ div{
 }
 
 
-input[type="button"], button {
+.select {
+    height: 23px;
+    background-color: white;
+    border: 0.1em #ddd solid;
+    border-radius: 0.5em;
+    color: #666;
+    font-size: 1em;
+    text-align: left;
+    border: 0.1em #ddd solid;
+}
+
+
+.button {
     display: inline-block;
     z-index: 0;
     cursor: pointer;
@@ -73,7 +78,6 @@ input[type="button"], button {
     text-align: center;
     height: 24px;
     min-width: 74px;
-
     background: -webkit-linear-gradient(top, #eee, #ddd);
     background: linear-gradient(top, #eee, #ddd, #eee);
     border: 0.1em solid #ddd;
@@ -87,20 +91,11 @@ input[type="button"], button {
 /*
 Hover style for all buttons
 */
-input[type="button"]:hover, button:hover {
+.button:hover {
     background: -webkit-linear-gradient(top, #eee, #ccc);
     border: 0.1em solid #ccc;
 }
 
-
-
-select {
-    height: 23px;
-    background-color: white;
-    border: 0.1em #ddd solid;
-    border-radius: 0.5em;
-    color: #666;
-}
 
 
 

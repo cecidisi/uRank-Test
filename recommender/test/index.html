@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="rs-test.css" />
         <link rel="stylesheet" href="../../app/css/main-style.css" />
         <link rel="stylesheet" href="libs/multiple-select-master/docs/css/base.css" />
-        <link rel="stylesheet" href="libs/multiple-select-master/docs/assets/flatdoc/theme-white/style.css" />
+<!--        <link rel="stylesheet" href="libs/multiple-select-master/docs/assets/flatdoc/theme-white/style.css" />-->
         <link rel="stylesheet" href="libs/multiple-select-master/multiple-select.css" />
     </head>
 
@@ -19,7 +19,7 @@
 
             <div class="inner">
                 <span>% Training data: </span>
-                <select id="select-pctg-training">
+                <select class="select" id="select-pctg-training">
                     <option value="60">60</option>
                     <option value="65">65</option>
                     <option value="70" selected>70</option>
@@ -30,7 +30,7 @@
 
             <div class="inner">
                 <span>Runs: </span>
-                <select id="select-runs">
+                <select class="select" id="select-runs">
                     <option value="1">1</option>
                     <option value="5" selected>5</option>
                     <option value="10">10</option>
@@ -43,7 +43,7 @@
 
             <div class="inner">
                 <span title="Number of recommendations to be returned by RS">Rec. Size: </span>
-                <select id="select-rec-size" multiple="multiple">
+                <select class="select" id="select-rec-size" multiple="multiple">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3" selected="selected">3</option>
@@ -60,7 +60,7 @@
             </div>
 
             <div class="inner">
-                <input type="button" id="btn-run" value="Run Test" />
+                <input type="button" class="button" id="btn-run" value="Run Test" />
             </div>
 
             <div class="inner">

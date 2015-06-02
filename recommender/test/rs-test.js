@@ -88,7 +88,7 @@
         results = [];
         stats = [];
 
-        var recSizes = [3, 5, 10],
+        var recSizes = $selectRecSize.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
             runs = $selectRuns.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100);
 
@@ -98,7 +98,6 @@
         $spinner.show();
         $downloadResults.hide();
         $downloadStats.hide();
-
 
         setTimeout(function(){
 

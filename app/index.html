@@ -23,14 +23,14 @@
 
     <body>
         <header>                            <!-- top panel -->
-            <select id="select-dataset"></select>
-            <select id="select-download">
+            <select class="select" id="select-dataset"></select>
+            <select class="select" id="select-download">
                 <option value="all">All (3 files)</option>
                 <option value="ranking">Ranking</option>
                 <option value="keywords">Keywords</option>
                 <option value="recs">Recommendations</option>
             </select>
-            <input type="button" id="btn-download" value="Download"/>
+            <input type="button" class="button" id="btn-download" value="Download"/>
       	</header>
 
         <div class="main-panel">
@@ -41,13 +41,13 @@
 
                 <!--<div class="control-panel">-->
                 <div class="ranking-controls">
-                    <button id="btn-reset" title="Reset">
+                    <button class="button" id="btn-reset" title="Reset">
                         <span class="sprite-reset"></span>
                     </button>
-                    <button id="btn-sort-by-overall-score" title="Sort by overall score">
+                    <button class="button" id="btn-sort-by-overall-score" title="Sort by overall score">
                         <span class="sprite-sort-down"></span>
                     </button>
-                    <button id="btn-sort-by-max-score" title="Sort by maximum score">
+                    <button class="button" id="btn-sort-by-max-score" title="Sort by maximum score">
                         <span class="sprite-wiggle"></span>
                     </button>
                 </div>
