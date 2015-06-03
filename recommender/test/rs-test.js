@@ -3,7 +3,8 @@
     var rec = new RS();
     var results = [], stats = [];
 
-    var $selectPctgTraining = $('#select-pctg-training'),
+    var $selectNumberTests = $('#select-number-tests'),
+        $selectPctgTraining = $('#select-pctg-training'),
         $selectRuns = $('#select-runs'),
         $selectRecSize = $('#select-rec-size'),
         $lblTrainingSize = $('#lbl-training-size'),
@@ -12,10 +13,15 @@
         $tableResults = $('table#results'),
         $tableStats = $('table#stats'),
         $statusMsg = $('#runing-status'),
-        $spinner = $('#spinner'),
-        $downloadResults = $('#download-results'),
-        $downloadStats = $('#download-stats'),
-        tbody = 'tbody';
+        $downloadResultsJson = $('#download-results-json'),
+        $downloadResultsCsv = $('#download-results-csv'),
+        $downloadStatsJson = $('#download-stats-json'),
+        $downloadStatsCsv = $('#download-stats-csv'),
+        $downloadLinks = $('.download-link'),
+        tbody = 'tbody',
+        $testSections = $('.inner.test');
+
+    var testSectionIdPrefix = '#test-';
 
     var dataSize = 0;
     evaluationResults.forEach(function(d){
@@ -84,102 +90,178 @@
     }
 
 
-    var runTest = function() {
-        results = [];
-        stats = [];
-
-        var recSizes = $selectRecSize.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
-            runs = $selectRuns.val(),
-            pctg = parseFloat($selectPctgTraining.val() / 100);
-
-        $tableResults.find(tbody).empty();
-        $tableStats.find(tbody).empty();
-        $statusMsg.text('Runing Test...');
-        $spinner.show();
-        $downloadResults.hide();
-        $downloadStats.hide();
-
-        setTimeout(function(){
-
-            recSizes.forEach(function(recSize){
-                var recallMean = 0, hitsMean = 0, localStats = [];
-                for(var run = 1; run<=runs; ++run) {
-                   // console.log('Runing run #' + run + ' for recommendation size = ' + recSize);
-                    //$statusMsg.text('Runing run #' + run + ' for recommendation size = ' + recSize);
-
-
-                    var data = getTrainingAndTestData(pctg);
-                    var trainingData = data.training;
-                    var testData = data.test;
-
-                    testData.forEach(function(d){
-                        d.keywords = d.keywords.map(function(k){ return {term: k, weight: 1}; });
-                    });
-
-                    var rsOptions = { recSize: recSize, beta: 0.5 };
-                    //  Test accuracy/precision/recall with tets data
-                    var result = rec.testRecommender(trainingData, testData, rsOptions);
-                    var rObj = { recSize: recSize, run: run, recall: result.recall, hits: result.hits  };
-
-                    results.push(rObj);
-                    localStats.push(rObj);
-
-                    recallMean += result.recall;
-                    hitsMean += result.hits;
-                }
-
-                recallMean = recallMean/runs;
-                hitsMean = hitsMean/runs;
-                stats.push({
-                    recSize: recSize,
-                    totalRuns: runs,
-                    recallMean: Math.roundTo(recallMean, 3),
-                    recallStdv: Math.roundTo(getStdv(localStats.map(function(l){ return l.recall }), recallMean), 3),
-                    hitsMean: Math.roundTo(hitsMean, 3),
-                    hitsStdv: Math.roundTo(getStdv(localStats.map(function(l){ return l.hits }), hitsMean), 3)
-                });
-            });
-
-           // console.log('test finished');
-            $statusMsg.text('Test finished!');
-            $spinner.hide();
-            $downloadResults.show();
-            $downloadStats.show();
-
-            fillTestTable(results, $tableResults);
-//
-//            results.forEach(function(r, i){
-//                var $row = $('<tr/>').appendTo($tableResults.find(tbody));
-//                $row.append('<td>' + r.recSize + '</td>');
-//                $row.append('<td>' + r.run + '</td>');
-//                $row.append('<td>' + r.recall + '</td>');
-//                $row.append('<td>' + r.hits + '</td>');
-//            });
-
-            stats.forEach(function(s){
-                var $row = $('<tr/>').appendTo($tableStats.find(tbody));
-                $row.append('<td>' + s.recSize + '</td>');
-                $row.append('<td>' + s.totalRuns + '</td>');
-                $row.append('<td>' + s.recallMean + '(' + s.recallStdv + ')</td>');
-                $row.append('<td>' + s.hitsMean + '(' + s.hitsStdv + ')</td>');
-            });
-
-        }, 10);
-    };
-
-
     function fillTestTable(testResults, $table) {
 
         $table.find(tbody).empty();
         testResults.forEach(function(r){
             var $row = $('<tr/>').appendTo($table.find(tbody));
+            $row.append('<td>' + r.testNum + '</td>');
+            $row.append('<td>' + r.beta + '</td>');
             $row.append('<td>' + r.recSize + '</td>');
             $row.append('<td>' + r.run + '</td>');
             $row.append('<td>' + r.recall + '</td>');
             $row.append('<td>' + r.hits + '</td>');
+            $row.append('<td>' + r.timeLapse + '</td>');
         });
     }
 
+
+    function processStats(betaValues){
+
+        var tests = _.groupBy(results, function(r){ return r.beta });
+        betaValues.forEach(function(beta, testNum){
+
+            var aggregatedTest = _.groupBy(tests[beta], function(t){ return t.recSize });
+            _.keys(aggregatedTest).forEach(function(recSize){
+
+                var recallMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.recall/arr.length) }, 0);
+                var hitsMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.hits/arr.length) }, 0);
+                var timeMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.timeLapse/arr.length) }, 0);
+
+                stats.push({
+                    testNum: testNum + 1,
+                    beta: beta,
+                    recSize: recSize,
+                    totalRuns: aggregatedTest[recSize].length,
+                    recallMean: Math.roundTo(recallMean, 3),
+                    recallStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.recall }), recallMean), 3),
+                    hitsMean: Math.roundTo(hitsMean, 3),
+                    hitsStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.hits }), hitsMean), 3),
+                    timeLapseMean: Math.roundTo(timeMean, 3),
+                    timeLapseStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.timeLapse }), timeMean), 3)
+                });
+            });
+        });
+
+        stats.forEach(function(s){
+            var $row = $('<tr/>').appendTo($tableStats.find(tbody));
+            $row.append('<td>' + s.testNum + '</td>');
+            $row.append('<td>' + s.beta + '</td>');
+            $row.append('<td>' + s.recSize + '</td>');
+            $row.append('<td>' + s.totalRuns + '</td>');
+            $row.append('<td>' + s.recallMean + '(' + s.recallStdv + ')</td>');
+            $row.append('<td>' + s.hitsMean + '(' + s.hitsStdv + ')</td>');
+            $row.append('<td>' + s.timeLapseMean + '(' + s.timeLapseStdv + ')</td>');
+        });
+
+    }
+
+
+    function finishProcessing(betaValues){
+
+        results = _.sortBy(results, function(r){ return r.testNum });
+
+
+        fillTestTable(results, $tableResults);
+        processStats(betaValues);
+
+        $statusMsg.removeClass('red').addClass('green').text('Test finished!');
+        $downloadLinks.show();
+    }
+
+
+    function getCsv(arr) {
+        var keys = _.keys(arr[0]),
+            csv = keys.join(',') + '\n';
+
+        arr.forEach(function(a){
+            var values = [];
+            keys.forEach(function(key){
+                values.push(a[key]);
+            });
+            csv += values.join(',') + '\n';
+        });
+        return csv;
+    }
+
+
+
+
+    var runTest = function() {
+        results = [];
+        stats = [];
+
+        $tableResults.find(tbody).empty();
+        $tableStats.find(tbody).empty();
+        $statusMsg.removeClass('green').addClass('red').text('Runing Test...');
+        $downloadLinks.hide();
+
+        var numberTests = $selectNumberTests.val(),
+            recSizes = $selectRecSize.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
+            runs = $selectRuns.val(),
+            pctg = parseFloat($selectPctgTraining.val() / 100),
+            betaValues = [];
+
+        for(var i=1; i<=numberTests; i++ )
+            betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
+
+        var totalToProcess = numberTests * recSizes.length * runs,
+            totalProcessed = 0;
+
+        function process(data, betaIndex, recSizeIndex, run) {
+
+            var recSize = recSizes[recSizeIndex],
+                beta = betaValues[betaIndex],
+                trainingData = data.training,
+                testData = data.test,
+                message = 'Runing... ' + Math.floor((++totalProcessed)*100/totalToProcess) + '% processed';
+
+            $statusMsg.text(message);
+
+            setTimeout(function(){
+                testData.forEach(function(d){
+                    d.keywords = d.keywords.map(function(k){ return {term: k, weight: 1}; });
+                });
+
+                var rsOptions = { recSize: recSize, beta: beta };
+                //  Test accuracy/precision/recall with tets data
+                var result = rec.testRecommender(trainingData, testData, rsOptions);
+                var rObj = {
+                    testNum: betaIndex + 1,
+                    beta: beta,
+                    recSize: recSize,
+                    run: run,
+                    recall: result.recall,
+                    hits: result.hits,
+                    timeLapse: result.timeLapse
+                };
+                results.push(rObj);
+
+                //  Update loop values before calling recursively
+                betaIndex++;
+                if(betaIndex == betaValues.length) {
+                    betaIndex = 0;
+                    run++
+                }
+                if(run > runs) {
+                    run = 1;
+                    betaIndex = 0;
+                    recSizeIndex++;
+                }
+                if(recSizeIndex == recSizes.length) {
+                    return finishProcessing(betaValues);
+                }
+
+                return process(getTrainingAndTestData(pctg), betaIndex, recSizeIndex, run);
+            }, 1);
+
+        }
+
+        process(getTrainingAndTestData(pctg), 0, 0, 1);
+    };
+
+
+
+    var selectNumberTestsChanged = function() {
+        var maxVisible = parseInt($selectNumberTests.val());
+        $testSections.each(function(i, testSection){
+            if(i < maxVisible)
+                $(testSection).slideDown();
+            else
+                $(testSection).slideUp();
+        });
+
+    };
 
     var pctgTrainingSelectChanged = function() {
         var pctg = $selectPctgTraining.val() / 100;
@@ -189,22 +271,26 @@
 
 
 
-    var downloadData = function(filename, content) {
+    var downloadData = function(filename, fileExtension, content) {
         var scriptURL = '../../server/download.php',
             date = new Date(),
             timestamp = date.getFullYear() + '-' + (parseInt(date.getMonth()) + 1) + '-' + date.getDate() + '_' + date.getHours() + '.' + date.getMinutes() + '.' + date.getSeconds();
 
-        $.generateFile({ filename: filename+'_'+timestamp+'.txt', content: content, script: scriptURL });
+        $.generateFile({ filename: filename+'_'+timestamp+'.'+fileExtension, content: content, script: scriptURL });
     };
 
 
 
     //  Bind event handlers
-    $selectPctgTraining.on('change', pctgTrainingSelectChanged);
-    $selectRecSize.multipleSelect();
-    $btnRun.on('click', runTest);
-    $downloadResults.click(function(){ downloadData('test_results', JSON.stringify(results)) });
-    $downloadStats.click(function(){ downloadData('statistics', JSON.stringify(stats)) });
 
-    $selectPctgTraining.trigger('change');
+    $btnRun.on('click', runTest);
+    $selectNumberTests.on('change', selectNumberTestsChanged).trigger('change');
+    $testSections.find('.spinner-beta').spinner({ min: 0, max: 1, step: 0.05 });
+    $selectRecSize.multipleSelect();
+    $selectPctgTraining.on('change', pctgTrainingSelectChanged).trigger('change');
+
+    $downloadResultsJson.click(function(){ downloadData('test_results', 'json', JSON.stringify(results)) });
+    $downloadResultsCsv.click(function(){ downloadData('test-results', 'csv', getCsv(results)) });
+    $downloadStatsJson.click(function(){ downloadData('statistics', 'json', JSON.stringify(stats)) });
+    $downloadStatsCsv.click(function(){ downloadData('statistics', 'csv', getCsv(stats)) });
 })();

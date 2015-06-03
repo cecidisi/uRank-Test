@@ -7,6 +7,9 @@
         <meta name="viewport" content="width=device-width">
 
         <link rel="stylesheet" href="rs-test.css" />
+        <link rel="stylesheet" href="../../bower_components/jquery-ui/themes/base/spinner.css" />
+        <link rel="stylesheet" href="../../bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css" />
+
         <link rel="stylesheet" href="../../app/css/main-style.css" />
 <!--        <link rel="stylesheet" href="libs/multiple-select-master/docs/css/base.css" />-->
         <link rel="stylesheet" href="libs/multiple-select-master/docs/assets/flatdoc/theme-white/style.css" />
@@ -15,34 +18,73 @@
 
     <body>
 
-        <div class="settings">
+        <div class="vertical-panel settings">
 
             <div class="inner">
-                <span>% Training data: </span>
-                <select class="select" id="select-pctg-training">
-                    <option value="60">60</option>
-                    <option value="65">65</option>
-                    <option value="70" selected>70</option>
-                    <option value="75">75</option>
-                    <option value="80">80</option>
-                </select>
+                <input type="button" class="my-button" id="btn-run" value="Run Test" />
+                <span id="runing-status"></span>
+                <!--                <div id="spinner" class="spinner-running"></div>-->
             </div>
 
+
+            <div class="delimiter"></div>
+            <!--   Number of tests-->
             <div class="inner">
-                <span>Runs: </span>
-                <select class="select" id="select-runs">
+                <div class="label-wrapper">
+                    <label title="">Tests: </label>
+                </div>
+                <select class="select" id="select-number-tests" >
                     <option value="1">1</option>
-                    <option value="5" selected>5</option>
-                    <option value="10">10</option>
-                    <option value="20" selected>20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                 </select>
             </div>
 
+            <!--  beta spinners  -->
+            <div class="inner test" id="test-1">
+                <div class="label-wrapper">
+                    <label>Test 1. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
 
+            <div class="inner test" id="test-2" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 2. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+
+            <div class="inner test" id="test-3" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 3. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+
+            <div class="inner test" id="test-4" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 4. &beta; =  </label>
+                </div>
+                <input class="spinner-beta"name="value" value="0.5" />
+            </div>
+
+            <div class="inner test" id="test-5" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 5. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+
+            <div class="delimiter"></div>
+
+            <!-- Recommendation set size  -->
             <div class="inner">
-                <span title="Number of recommendations to be returned by RS">Rec. Size: </span>
+                <div class="label-wrapper">
+                    <label title="Number of recommendations to be returned by RS">Rec. Size: </label>
+                </div>
                 <select class="select" id="select-rec-size" multiple="multiple">
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -59,41 +101,70 @@
                 </select>
             </div>
 
+            <div class="delimiter"></div>
+            <!--    Number of runs  -->
             <div class="inner">
-                <input type="button" class="my-button" id="btn-run" value="Run Test" />
+                <div class="label-wrapper">
+                    <label title="Runs per recommendation size selected">Runs: </label>
+                </div>
+                <select class="select" id="select-runs">
+                    <option value="1">1</option>
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
             </div>
 
+            <div class="delimiter"></div>
+            <!--    Training dataset size   -->
             <div class="inner">
-                <span id="runing-status"></span>
-<!--                <div id="spinner" class="spinner"></div>-->
+                <div class="label-wrapper">
+                    <label>% Training data: </label>
+                </div>
+                <select class="select" id="select-pctg-training">
+                    <option value="60">60</option>
+                    <option value="65">65</option>
+                    <option value="70" selected>70</option>
+                    <option value="75">75</option>
+                    <option value="80">80</option>
+                </select>
             </div>
-        </div>
 
-        <div class="settings">
+            <!--    Training and test datasets size indicators  -->
             <div class="inner">
-                <span>Training dataset size:    </span>
+                <div class="label-wrapper">
+                    <label>Training dataset size: </label>
+                </div>
                 <span id="lbl-training-size" class="red"></span>
             </div>
-        </div>
-        <div class="settings">
+
             <div class="inner">
-                <span>Test dataset size:    </span>
+                <div class="label-wrapper">
+                    <label>Test dataset size: </label>
+                </div>
                 <span id="lbl-test-size" class="red"></span>
             </div>
+
         </div>
 
 
 
-        <div class="table-container">
-            <span>Test Results</span>
-            <a id="download-results" href="#">Download</a>
-            <table id="results">
+        <div class="vertical-panel">
+            <span>General Statistics</span>
+            <a class="download-link" id="download-stats-csv" href="#">&darr;csv</a>
+            <a class="download-link" id="download-stats-json" href="#">&darr;json</a>
+            <table id="stats">
                 <thead>
                     <tr>
+                        <th>#Test</th>
+                        <th>&beta;</th>
                         <th>Rec. Size</th>
-                        <th>#Run</th>
-                        <th>Recall</th>
-                        <th>Hits</th>
+                        <th>Total Runs</th>
+                        <th>Recall mean(stdv)</th>
+                        <th>Hits mean(stdv)</th>
+                        <th>Time Lapse mean(stdv)</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -101,16 +172,20 @@
         </div>
 
 
-        <div class="table-container">
-            <span>Statistics</span>
-            <a id="download-stats" href="#">Download</a>
-            <table id="stats">
+        <div class="vertical-panel">
+            <span>Test Results</span>
+            <a class="download-link" id="download-results-csv" href="#">&darr;csv</a>
+            <a class="download-link" id="download-results-json" href="#">&darr;json</a>
+            <table id="results">
                 <thead>
                     <tr>
+                        <th>#Test</th>
+                        <th>&beta;</th>
                         <th>Rec. Size</th>
-                        <th>Total Runs</th>
-                        <th>Recall mean(stdv)</th>
-                        <th>Hits mean(stdv)</th>
+                        <th>#Run</th>
+                        <th>Recall</th>
+                        <th>Hits</th>
+                        <th>Time Lapse</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -123,6 +198,7 @@
 
         <!--Bower scripts-->
         <script src="../../bower_components/jquery/dist/jquery.js"></script>
+        <script src="../../bower_components/jquery-ui/jquery-ui.min.js"></script>
         <script src="../../bower_components/underscore/underscore.js"></script>
 
         <!-- App scripts -->

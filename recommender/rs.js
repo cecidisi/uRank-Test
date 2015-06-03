@@ -185,6 +185,7 @@ window.RS = (function(){
             //         |-> all good items
 
             var hits = 0;
+            var timeLapse = $.now();
 
             testData.forEach(function(d){
                 var args = {
@@ -197,7 +198,9 @@ window.RS = (function(){
                 if(_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1)
                     hits++;
             });
-            return { hits: hits, recall: Math.roundTo(hits/testData.length, 3) };
+
+            timeLapse = $.now() - timeLapse;
+            return { hits: hits, recall: Math.roundTo(hits/testData.length, 3), timeLapse: timeLapse  };
         },
 
         //  Miscelaneous
