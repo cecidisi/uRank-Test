@@ -204,7 +204,7 @@
                 beta = betaValues[betaIndex],
                 trainingData = data.training,
                 testData = data.test,
-                message = 'Runing... ' + Math.floor((++totalProcessed)*100/totalToProcess) + '% processed';
+                message = 'Runing... ' + Math.roundTo((++totalProcessed)*100/totalToProcess, 1) + '% processed';
 
             $statusMsg.text(message);
 
