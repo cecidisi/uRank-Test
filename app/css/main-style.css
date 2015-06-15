@@ -91,7 +91,7 @@ div{
 /*
 Hover style for all buttons
 */
-.button:hover {
+.my-button:hover {
     background: -webkit-linear-gradient(top, #eee, #ccc);
     border: 0.1em solid #ccc;
 }

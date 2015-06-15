@@ -67,7 +67,7 @@ window.RS = (function(){
                 keywords: [],
                 options: {
                     beta: 0.5,
-                    neighborhoodSize: 30,
+                    neighborhoodSize: 20,
                     and: false,
                     recSize: 0
                 }
@@ -179,11 +179,6 @@ window.RS = (function(){
                 _this.addBookmark(d);
             });
 
-            //  Case/Prediction matrix
-            var m = { tp: 0, fp: 0,         // <- all recommended items
-                      fn: 0, tn: 0 };
-            //         |-> all good items
-
             var hits = 0;
             var timeLapse = $.now();
 
@@ -195,6 +190,7 @@ window.RS = (function(){
                 };
 
                 var recs = _this.getRecommendations(args);
+
                 if(_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1)
                     hits++;
             });

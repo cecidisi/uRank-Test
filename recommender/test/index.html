@@ -26,12 +26,11 @@
                 <!--                <div id="spinner" class="spinner-running"></div>-->
             </div>
 
-
             <div class="delimiter"></div>
             <!--   Number of tests-->
             <div class="inner">
                 <div class="label-wrapper">
-                    <label title="">Tests: </label>
+                    <label title=""># TU-RS Tests: </label>
                 </div>
                 <select class="select" id="select-number-tests" >
                     <option value="1">1</option>
@@ -80,6 +79,15 @@
 
             <div class="delimiter"></div>
 
+            <!-- POP algorithm selection -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against most popular RS">Test POP-RS </label>
+                </div>
+                <input type="checkbox" id="ckb-pop-alg" checked="checked" />
+            </div>
+
+            <div class="delimiter"></div>
             <!-- Recommendation set size  -->
             <div class="inner">
                 <div class="label-wrapper">
@@ -159,7 +167,7 @@
                 <thead>
                     <tr>
                         <th>#Test</th>
-                        <th>&beta;</th>
+                        <th>Algorithm</th>
                         <th>Rec. Size</th>
                         <th>Total Runs</th>
                         <th>Recall mean(stdv)</th>
@@ -180,7 +188,7 @@
                 <thead>
                     <tr>
                         <th>#Test</th>
-                        <th>&beta;</th>
+                        <th>Algorithm</th>
                         <th>Rec. Size</th>
                         <th>#Run</th>
                         <th>Recall</th>
@@ -203,6 +211,7 @@
 
         <!-- App scripts -->
         <script type="text/javascript" src="../rs.js" charset="utf-8"></script>
+        <script type="text/javascript" src="rs-pop.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../app/js/evaluation-results.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../app/js/file-generator.js" charset="utf-8"></script>
         <script type="text/javascript" src="libs/multiple-select-master/jquery.multiple.select.js" charset="utf-8"></script>

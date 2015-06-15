@@ -1,9 +1,11 @@
 (function(){
 
-    var rec = new RS();
+    var rsTU = new RS();
+    var rsPOP = new RSpop();
     var results = [], stats = [];
 
     var $selectNumberTests = $('#select-number-tests'),
+        $ckbPopAlg = $('#ckb-pop-alg'),
         $selectPctgTraining = $('#select-pctg-training'),
         $selectRuns = $('#select-runs'),
         $selectRecSize = $('#select-rec-size'),
@@ -65,7 +67,7 @@
 
                     q['selected-items'].forEach(function(d){
                         var usedKeywords = shuffle(keywords).slice(0, randomFromTo(2,keywords.length));
-                        data.push({ user: user, doc: d.id, keywords: usedKeywords });
+                        data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic });
                     });
                 });
             });
@@ -76,6 +78,9 @@
         var shuffledData = shuffle(data);
         var trainingData = shuffledData.slice(0, cutIndex);
         var testData = shuffledData.slice(cutIndex, shuffledData.length);
+        testData.forEach(function(d){
+            d.keywords = d.keywords.map(function(k){ return { term: k, weight: 1 }; });
+        });
 
         return { training: trainingData, test: testData };
     }
@@ -96,7 +101,8 @@
         testResults.forEach(function(r){
             var $row = $('<tr/>').appendTo($table.find(tbody));
             $row.append('<td>' + r.testNum + '</td>');
-            $row.append('<td>' + r.beta + '</td>');
+            $row.append('<td>' + r.algorithm.replace('beta', 'β') + '</td>');
+        //    $row.append('<td>' + r.beta + '</td>');
             $row.append('<td>' + r.recSize + '</td>');
             $row.append('<td>' + r.run + '</td>');
             $row.append('<td>' + r.recall + '</td>');
@@ -106,12 +112,14 @@
     }
 
 
-    function processStats(betaValues){
+    function processStats(){
 
-        var tests = _.groupBy(results, function(r){ return r.beta });
-        betaValues.forEach(function(beta, testNum){
+        var tests = _.groupBy(results, function(r){ return r.testNum });
+        var testNums = _.keys(tests);
 
-            var aggregatedTest = _.groupBy(tests[beta], function(t){ return t.recSize });
+        testNums.forEach(function(testNum){//})
+
+            var aggregatedTest = _.groupBy(tests[testNum], function(t){ return t.recSize });
             _.keys(aggregatedTest).forEach(function(recSize){
 
                 var recallMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.recall/arr.length) }, 0);
@@ -119,8 +127,9 @@
                 var timeMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.timeLapse/arr.length) }, 0);
 
                 stats.push({
-                    testNum: testNum + 1,
-                    beta: beta,
+                    testNum: testNum,
+                    algorithm: tests[testNum][0].algorithm,
+                   // beta: tests[testNum][0].beta,
                     recSize: recSize,
                     totalRuns: aggregatedTest[recSize].length,
                     recallMean: Math.roundTo(recallMean, 3),
@@ -136,7 +145,8 @@
         stats.forEach(function(s){
             var $row = $('<tr/>').appendTo($tableStats.find(tbody));
             $row.append('<td>' + s.testNum + '</td>');
-            $row.append('<td>' + s.beta + '</td>');
+            $row.append('<td>' + s.algorithm.replace('beta', 'β') + '</td>');
+        //    $row.append('<td>' + s.beta + '</td>');
             $row.append('<td>' + s.recSize + '</td>');
             $row.append('<td>' + s.totalRuns + '</td>');
             $row.append('<td>' + s.recallMean + '(' + s.recallStdv + ')</td>');
@@ -150,7 +160,6 @@
     function finishProcessing(betaValues){
 
         results = _.sortBy(results, function(r){ return r.testNum });
-
 
         fillTestTable(results, $tableResults);
         processStats(betaValues);
@@ -186,22 +195,39 @@
         $statusMsg.removeClass('green').addClass('red').text('Runing Test...');
         $downloadLinks.hide();
 
-        var numberTests = $selectNumberTests.val(),
+        var numberTUTests = $selectNumberTests.val(),
             recSizes = $selectRecSize.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
             runs = $selectRuns.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100),
-            betaValues = [];
+            betaValues = [],
+            conditions = [];
 
-        for(var i=1; i<=numberTests; i++ )
+        //  Set conditions por TU tets and add POP test if checkbox is checked
+        for(var i=1; i<=numberTUTests; i++ ) {
             betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
+            conditions.push({ alg: 'TU', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
+        }
 
-        var totalToProcess = numberTests * recSizes.length * runs,
+        if($ckbPopAlg.is(':checked'))
+            conditions.push({ alg: 'POP', beta: '-' });
+
+        var totalToProcess = conditions.length * recSizes.length * runs,
             totalProcessed = 0;
 
-        function process(data, betaIndex, recSizeIndex, run) {
+        var testFunc = {
+            TU: function(trainingData, testData, rsOptions) {
+                return rsTU.testRecommender(trainingData, testData, rsOptions);
+            },
+            POP: function(trainingData, testData, rsOptions) {
+                return rsPOP.testRecommender(trainingData, testData, rsOptions);
+            }
+        };
 
-            var recSize = recSizes[recSizeIndex],
-                beta = betaValues[betaIndex],
+        function process(data, condIndex, recSizeIndex, run) {
+
+            var algorithm = conditions[condIndex].alg,
+                beta = conditions[condIndex].beta,
+                recSize = recSizes[recSizeIndex],
                 trainingData = data.training,
                 testData = data.test,
                 message = 'Runing... ' + Math.roundTo((++totalProcessed)*100/totalToProcess, 1) + '% processed';
@@ -209,16 +235,15 @@
             $statusMsg.text(message);
 
             setTimeout(function(){
-                testData.forEach(function(d){
-                    d.keywords = d.keywords.map(function(k){ return {term: k, weight: 1}; });
-                });
 
                 var rsOptions = { recSize: recSize, beta: beta };
-                //  Test accuracy/precision/recall with tets data
-                var result = rec.testRecommender(trainingData, testData, rsOptions);
+                var result = testFunc[algorithm](trainingData.slice(), testData.slice(), rsOptions);
+                var algStr = beta != '-' ? algorithm + '(beta=' + beta + ')' : algorithm;
+
                 var rObj = {
-                    testNum: betaIndex + 1,
-                    beta: beta,
+                    testNum: condIndex + 1,
+                    algorithm: algStr,
+                    //beta: beta,
                     recSize: recSize,
                     run: run,
                     recall: result.recall,
@@ -228,24 +253,25 @@
                 results.push(rObj);
 
                 //  Update loop values before calling recursively
-                betaIndex++;
-                if(betaIndex == betaValues.length) {
-                    betaIndex = 0;
+                condIndex++;
+                if(condIndex == conditions.length) {
+                    condIndex = 0;
                     run++
+                    data = getTrainingAndTestData(pctg);
                 }
                 if(run > runs) {
                     run = 1;
-                    betaIndex = 0;
+                    condIndex = 0;
                     recSizeIndex++;
                 }
                 if(recSizeIndex == recSizes.length) {
-                    return finishProcessing(betaValues);
+                    return finishProcessing();
                 }
 
-                return process(getTrainingAndTestData(pctg), betaIndex, recSizeIndex, run);
+                return process(data, condIndex, recSizeIndex, run);
             }, 1);
-
         }
+
 
         process(getTrainingAndTestData(pctg), 0, 0, 1);
     };

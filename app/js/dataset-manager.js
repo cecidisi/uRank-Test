@@ -34,7 +34,7 @@ function datasetManager(){
     this.getDataset = function(datasetId, callback){
 
         if(datasetMappings[datasetId]){
-            $.getJSON('datasets/'+datasetMappings[datasetId].file, function(data){
+            $.getJSON('../datasets/'+datasetMappings[datasetId].file, function(data){
                 console.log('Dataset '+ datasetId +' retrieved');
                 callback.call(this, data);
             })
