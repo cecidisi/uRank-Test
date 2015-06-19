@@ -1,11 +1,12 @@
 
 .vertical-panel {
-    margin: 50px 20px;
-    width: calc(37% - 40px);
+    margin: 50px 8px;
+    width: calc(38% - 16px);
     height: calc(100% - 70px);
     overflow-y: auto;
     display: inline-block;
     float: left;
+    font-size: .95em;
 }
 
 .vertical-panel.settings {
@@ -46,7 +47,7 @@
 }
 
 .inner .select[multiple="multiple"] {
-    width: 120px;
+    width: 100px;
 }
 
 

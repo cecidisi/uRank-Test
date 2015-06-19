@@ -102,10 +102,10 @@
             var $row = $('<tr/>').appendTo($table.find(tbody));
             $row.append('<td>' + r.testNum + '</td>');
             $row.append('<td>' + r.algorithm.replace('beta', 'β') + '</td>');
-        //    $row.append('<td>' + r.beta + '</td>');
             $row.append('<td>' + r.recSize + '</td>');
             $row.append('<td>' + r.run + '</td>');
             $row.append('<td>' + r.recall + '</td>');
+            $row.append('<td>' + r.precision + '</td>');
             $row.append('<td>' + r.hits + '</td>');
             $row.append('<td>' + r.timeLapse + '</td>');
         });
@@ -123,6 +123,7 @@
             _.keys(aggregatedTest).forEach(function(recSize){
 
                 var recallMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.recall/arr.length) }, 0);
+                var precisionMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.precision/arr.length) }, 0);
                 var hitsMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.hits/arr.length) }, 0);
                 var timeMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.timeLapse/arr.length) }, 0);
 
@@ -134,6 +135,8 @@
                     totalRuns: aggregatedTest[recSize].length,
                     recallMean: Math.roundTo(recallMean, 3),
                     recallStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.recall }), recallMean), 3),
+                    precisionMean: Math.roundTo(precisionMean, 3),
+                    precisionStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.precision }), precisionMean), 3),
                     hitsMean: Math.roundTo(hitsMean, 3),
                     hitsStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.hits }), hitsMean), 3),
                     timeLapseMean: Math.roundTo(timeMean, 3),
@@ -146,10 +149,10 @@
             var $row = $('<tr/>').appendTo($tableStats.find(tbody));
             $row.append('<td>' + s.testNum + '</td>');
             $row.append('<td>' + s.algorithm.replace('beta', 'β') + '</td>');
-        //    $row.append('<td>' + s.beta + '</td>');
             $row.append('<td>' + s.recSize + '</td>');
             $row.append('<td>' + s.totalRuns + '</td>');
             $row.append('<td>' + s.recallMean + '(' + s.recallStdv + ')</td>');
+            $row.append('<td>' + s.precisionMean + '(' + s.precisionStdv + ')</td>');
             $row.append('<td>' + s.hitsMean + '(' + s.hitsStdv + ')</td>');
             $row.append('<td>' + s.timeLapseMean + '(' + s.timeLapseStdv + ')</td>');
         });
@@ -157,12 +160,22 @@
     }
 
 
-    function finishProcessing(betaValues){
+    function finishProcessing(){
 
-        results = _.sortBy(results, function(r){ return r.testNum });
+        //results = _.sortBy(results, function(r){ return r.testNum });
+
+        results = results.sort(function(r1, r2){
+            if(r1.testNum < r2.testNum) return -1;
+            if(r1.testNum > r2.testNum) return 1;
+            if(r1.recSize < r2.recSize) return -1;
+            if(r1.recSize > r2.recSize) return 1;
+            if(r1.run < r2.run) return -1;
+            if(r1.run > r2.run) return 1;
+            return 0;
+        })
 
         fillTestTable(results, $tableResults);
-        processStats(betaValues);
+        processStats();
 
         $statusMsg.removeClass('red').addClass('green').text('Test finished!');
         $downloadLinks.show();
@@ -243,28 +256,27 @@
                 var rObj = {
                     testNum: condIndex + 1,
                     algorithm: algStr,
-                    //beta: beta,
                     recSize: recSize,
                     run: run,
                     recall: result.recall,
+                    precision: result.precision,
                     hits: result.hits,
                     timeLapse: result.timeLapse
                 };
                 results.push(rObj);
 
-                //  Update loop values before calling recursively
                 condIndex++;
                 if(condIndex == conditions.length) {
                     condIndex = 0;
-                    run++
+                    recSizeIndex++;
                     data = getTrainingAndTestData(pctg);
                 }
-                if(run > runs) {
-                    run = 1;
-                    condIndex = 0;
-                    recSizeIndex++;
-                }
                 if(recSizeIndex == recSizes.length) {
+                    condIndex = 0;
+                    recSizeIndex = 0;
+                    run++
+                }
+                if(run > runs) {
                     return finishProcessing();
                 }
 

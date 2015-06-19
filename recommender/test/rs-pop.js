@@ -73,14 +73,17 @@ window.RSpop = (function(){
                     topic: d.topic,
                     options: o
                 };
-
                 var recs = _this.getRecommendations(args);
-                if(_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1)
-                    hits++;
+                hits = (_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1) ? hits + 1 : hits;
             });
 
             timeLapse = $.now() - timeLapse;
-            return { hits: hits, recall: Math.roundTo(hits/testData.length, 3), timeLapse: timeLapse  };
+            return {
+                hits: hits,
+                recall: Math.roundTo(hits/testData.length, 3),
+                precision: Math.roundTo(hits/(testData.length * o.recSize), 3),
+                timeLapse: timeLapse
+            };
         }
 
     };

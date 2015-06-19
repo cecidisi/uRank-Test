@@ -179,8 +179,8 @@ window.RS = (function(){
                 _this.addBookmark(d);
             });
 
-            var hits = 0;
-            var timeLapse = $.now();
+            var hits = 0,       // == true positives
+                timeLapse = $.now();
 
             testData.forEach(function(d){
                 var args = {
@@ -190,13 +190,18 @@ window.RS = (function(){
                 };
 
                 var recs = _this.getRecommendations(args);
-
-                if(_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1)
-                    hits++;
+                hits = (_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1) ? hits + 1 : hits;
             });
 
-            timeLapse = $.now() - timeLapse;
-            return { hits: hits, recall: Math.roundTo(hits/testData.length, 3), timeLapse: timeLapse  };
+            var result = {
+                hits: hits,
+                recall: Math.roundTo(hits/testData.length, 3),
+                precision: Math.roundTo(hits/(testData.length * o.recSize), 3),
+                timeLapse: $.now() -  timeLapse
+            };
+            console.log(result);
+
+            return result;
         },
 
         //  Miscelaneous
