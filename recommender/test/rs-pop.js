@@ -4,6 +4,11 @@ if(!Math.roundTo)
         return +(Math.round(value + "e+" + places)  + "e-" + places);
     }
 
+if(!Math.log2)
+    Math.log2 = function(value) {
+        return (Math.log(value) / Math.log(2));
+    }
+
 
 window.RSpop = (function(){
 
@@ -53,38 +58,6 @@ window.RSpop = (function(){
         clear: function() {
             this.topicItemMatrix = {};
         },
-
-        testRecommender: function(trainingData, testData, options) {
-            var o = $.extend({
-                recSize: 0
-            }, options);
-
-            this.clear();
-
-            trainingData.forEach(function(d){
-                _this.addBookmark(d);
-            });
-
-            var hits = 0;
-            var timeLapse = $.now();
-
-            testData.forEach(function(d){
-                var args = {
-                    topic: d.topic,
-                    options: o
-                };
-                var recs = _this.getRecommendations(args);
-                hits = (_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1) ? hits + 1 : hits;
-            });
-
-            timeLapse = $.now() - timeLapse;
-            return {
-                hits: hits,
-                recall: Math.roundTo(hits/testData.length, 3),
-                precision: Math.roundTo(hits/(testData.length * o.recSize), 3),
-                timeLapse: timeLapse
-            };
-        }
 
     };
 

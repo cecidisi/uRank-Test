@@ -1,21 +1,16 @@
-
-.vertical-panel {
-    margin: 50px 8px;
-    width: calc(38% - 16px);
-    height: calc(100% - 70px);
-    overflow-y: auto;
+.settings-panel {
     display: inline-block;
     float: left;
-    font-size: .95em;
-}
-
-.vertical-panel.settings {
-    width: calc(25% - 40px);
+    width: calc(27% - 40px);
+    height: calc(100% - 40px);
+    margin: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
-.vertical-panel .inner {
+.settings-panel .inner {
     width: calc(100% - 20px);
     padding: 10px;
     display: block;
@@ -47,7 +42,7 @@
 }
 
 .inner .select[multiple="multiple"] {
-    width: 100px;
+    width: 120px;
 }
 
 
@@ -92,12 +87,33 @@
 /*table*/
 
 
+.table-panel {
+    max-width: calc(72% - 40px);
+    height: calc(50% - 40px);
+    overflow-y: hidden;
+    display: inline-block;
+    float: left;
+    margin: 20px;
+    font-size: .95em;
+}
+
+
+.table-panel .section-header {
+    height: 20px;
+}
+
 .download-link {
     float: right;
     margin-right: 10px;
     display: none;
 }
 
+
+.table-panel .table-container {
+    height: calc(100% - 20px);
+    width: 100%;
+    overflow: auto;
+}
 
 
 table {

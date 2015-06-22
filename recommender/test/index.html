@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="rs-test.css" />
+        <link rel="stylesheet" href="style/main.css" />
         <link rel="stylesheet" href="../../bower_components/jquery-ui/themes/base/spinner.css" />
         <link rel="stylesheet" href="../../bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css" />
 
@@ -18,7 +18,7 @@
 
     <body>
 
-        <div class="vertical-panel settings">
+        <div class="settings-panel">
 
             <div class="inner">
                 <input type="button" class="my-button" id="btn-run" value="Run Test" />
@@ -103,7 +103,7 @@
                     <option value="7">7</option>
                     <option value="8">8</option>
                     <option value="9">9</option>
-                    <option value="10" selected="selected">10</option>
+                    <option value="10">10</option>
                     <option value="12">12</option>
                     <option value="15">15</option>
                 </select>
@@ -117,9 +117,9 @@
                 </div>
                 <select class="select" id="select-runs">
                     <option value="1">1</option>
-                    <option value="3">3</option>
+                    <option value="3" selected>3</option>
                     <option value="5">5</option>
-                    <option value="10" selected>10</option>
+                    <option value="10">10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
@@ -163,47 +163,61 @@
 
 
 
-        <div class="vertical-panel">
-            <span>General Statistics</span>
-            <a class="download-link" id="download-stats-csv" href="#">&darr;csv</a>
-            <a class="download-link" id="download-stats-json" href="#">&darr;json</a>
-            <table id="stats">
-                <thead>
-                    <tr>
-                        <th>#Test</th>
-                        <th>Algorithm</th>
-                        <th>Rec. Size</th>
-                        <th>Total Runs</th>
-                        <th>Recall mean(stdv)</th>
-                        <th>Precision mean(stdv)</th>
-                        <th>Hits mean(stdv)</th>
-                        <th>Time Lapse mean(stdv)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="table-panel">
+            <div class="section-header">
+                <span>General Statistics</span>
+                <a class="download-link" id="download-stats-csv" href="#">&darr;csv</a>
+                <a class="download-link" id="download-stats-json" href="#">&darr;json</a>
+            </div>
+            <div class="table-container">
+                <table id="stats">
+                    <thead>
+                        <tr>
+                            <th>#Test</th>
+                            <th>Algorithm</th>
+                            <th>Rec. Size</th>
+                            <th>Total Runs</th>
+                            <th>Hits mean(stdv)</th>
+                            <th>Recall mean(stdv)</th>
+                            <th>Precision mean(stdv)</th>
+                            <th>F1 mean(stdv)</th>
+                            <th>RankScore mean(stdv)</th>
+                            <th>NDCG mean(stdv)</th>
+                            <th>Time Lapse mean(stdv)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
 
-        <div class="vertical-panel">
-            <span>Test Results</span>
-            <a class="download-link" id="download-results-csv" href="#">&darr;csv</a>
-            <a class="download-link" id="download-results-json" href="#">&darr;json</a>
-            <table id="results">
-                <thead>
-                    <tr>
-                        <th>#Test</th>
-                        <th>Algorithm</th>
-                        <th>Rec. Size</th>
-                        <th>#Run</th>
-                        <th>Recall</th>
-                        <th>Precision</th>
-                        <th>Hits</th>
-                        <th>Time Lapse</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="table-panel">
+            <div class="section-header">
+                <span>Test Results</span>
+                <a class="download-link" id="download-results-csv" href="#">&darr;csv</a>
+                <a class="download-link" id="download-results-json" href="#">&darr;json</a>
+            </div>
+            <div class="table-container">
+                <table id="results">
+                    <thead>
+                        <tr>
+                            <th>#Test</th>
+                            <th>Algorithm</th>
+                            <th>Rec. Size</th>
+                            <th>#Run</th>
+                            <th>Hits</th>
+                            <th>Recall</th>
+                            <th>Precision</th>
+                            <th>F1</th>
+                            <th>RankScore</th>
+                            <th>NDCG</th>
+                            <th>Time Lapse</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
 
@@ -221,6 +235,7 @@
         <script type="text/javascript" src="../../app/js/evaluation-results.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../app/js/file-generator.js" charset="utf-8"></script>
         <script type="text/javascript" src="libs/multiple-select-master/jquery.multiple.select.js" charset="utf-8"></script>
-        <script type="text/javascript" src="rs-test.js" charset="utf-8"></script>
+        <script type="text/javascript" src="rs-tester.js" charset="utf-8"></script>
+        <script type="text/javascript" src="main.js" charset="utf-8"></script>
     </body>
 </html>

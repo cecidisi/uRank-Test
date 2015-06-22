@@ -1,8 +1,8 @@
 (function(){
 
-    var rsTU = new RS();
-    var rsPOP = new RSpop();
+    var rsTester = new RStester();
     var results = [], stats = [];
+    var decPos = 3;
 
     var $selectNumberTests = $('#select-number-tests'),
         $ckbPopAlg = $('#ckb-pop-alg'),
@@ -95,25 +95,9 @@
     }
 
 
-    function fillTestTable(testResults, $table) {
+    function processStats(metrics){
 
-        $table.find(tbody).empty();
-        testResults.forEach(function(r){
-            var $row = $('<tr/>').appendTo($table.find(tbody));
-            $row.append('<td>' + r.testNum + '</td>');
-            $row.append('<td>' + r.algorithm.replace('beta', 'β') + '</td>');
-            $row.append('<td>' + r.recSize + '</td>');
-            $row.append('<td>' + r.run + '</td>');
-            $row.append('<td>' + r.recall + '</td>');
-            $row.append('<td>' + r.precision + '</td>');
-            $row.append('<td>' + r.hits + '</td>');
-            $row.append('<td>' + r.timeLapse + '</td>');
-        });
-    }
-
-
-    function processStats(){
-
+        var stats = [];
         var tests = _.groupBy(results, function(r){ return r.testNum });
         var testNums = _.keys(tests);
 
@@ -122,47 +106,46 @@
             var aggregatedTest = _.groupBy(tests[testNum], function(t){ return t.recSize });
             _.keys(aggregatedTest).forEach(function(recSize){
 
-                var recallMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.recall/arr.length) }, 0);
-                var precisionMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.precision/arr.length) }, 0);
-                var hitsMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.hits/arr.length) }, 0);
-                var timeMean = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){ return prev + (cur.timeLapse/arr.length) }, 0);
+                var ceroMeans = {};
+                metrics.forEach(function(metric){ ceroMeans[metric] = 0; });
+
+                var means = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){
+                    var obj = {};
+                    metrics.forEach(function(metric){ obj[metric] = prev[metric] + (cur[metric]/arr.length) });
+                    return obj;
+                }, ceroMeans);
 
                 stats.push({
                     testNum: testNum,
                     algorithm: tests[testNum][0].algorithm,
-                   // beta: tests[testNum][0].beta,
                     recSize: recSize,
-                    totalRuns: aggregatedTest[recSize].length,
-                    recallMean: Math.roundTo(recallMean, 3),
-                    recallStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.recall }), recallMean), 3),
-                    precisionMean: Math.roundTo(precisionMean, 3),
-                    precisionStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.precision }), precisionMean), 3),
-                    hitsMean: Math.roundTo(hitsMean, 3),
-                    hitsStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.hits }), hitsMean), 3),
-                    timeLapseMean: Math.roundTo(timeMean, 3),
-                    timeLapseStdv: Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l.timeLapse }), timeMean), 3)
+                    totalRuns: aggregatedTest[recSize].length
+                });
+
+                metrics.forEach(function(metric){
+                    stats[stats.length - 1][metric + 'Mean'] = Math.roundTo(means[metric], decPos);
+                    stats[stats.length - 1][metric + 'Stdv'] = Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l[metric] }), means[metric]), decPos);
                 });
             });
         });
 
-        stats.forEach(function(s){
-            var $row = $('<tr/>').appendTo($tableStats.find(tbody));
-            $row.append('<td>' + s.testNum + '</td>');
-            $row.append('<td>' + s.algorithm.replace('beta', 'β') + '</td>');
-            $row.append('<td>' + s.recSize + '</td>');
-            $row.append('<td>' + s.totalRuns + '</td>');
-            $row.append('<td>' + s.recallMean + '(' + s.recallStdv + ')</td>');
-            $row.append('<td>' + s.precisionMean + '(' + s.precisionStdv + ')</td>');
-            $row.append('<td>' + s.hitsMean + '(' + s.hitsStdv + ')</td>');
-            $row.append('<td>' + s.timeLapseMean + '(' + s.timeLapseStdv + ')</td>');
-        });
-
+        return stats;
     }
 
 
-    function finishProcessing(){
+    function fillTable($table, rows) {
+        $table.find(tbody).empty();
+        rows.forEach(function(row){
+            var $row = $('<tr/>').appendTo($table.find(tbody));
+            row.forEach(function(value){
+                $row.append('<td>' + value.toString().replace('beta', 'β') + '</td>');
+            });
+        });
+    }
 
-        //results = _.sortBy(results, function(r){ return r.testNum });
+
+
+    function finishProcessing(metrics){
 
         results = results.sort(function(r1, r2){
             if(r1.testNum < r2.testNum) return -1;
@@ -174,8 +157,30 @@
             return 0;
         })
 
-        fillTestTable(results, $tableResults);
-        processStats();
+        var keys = ['testNum', 'algorithm', 'recSize', 'run'];
+        keys = $.merge(keys, metrics);
+        var rows = new Array(results.length);
+        results.forEach(function(r, i){
+            rows[i] = new Array();
+            keys.forEach(function(key, j){
+                rows[i].push(r[keys[j]]);
+            });
+        });
+        fillTable($tableResults, rows);
+
+        rows = new Array(stats.length);
+        keys = ['testNum', 'algorithm', 'recSize', 'totalRuns'];
+        stats = processStats(metrics);
+        stats.forEach(function(s, i){
+            rows[i] = new Array();
+            keys.forEach(function(key, j){
+                rows[i].push(s[keys[j]]);
+            });
+            metrics.forEach(function(metric){
+                rows[i].push(s[metric + 'Mean'] + '(' + s[metric + 'Stdv'] + ')');
+            });
+        });
+        fillTable($tableStats, rows);
 
         $statusMsg.removeClass('red').addClass('green').text('Test finished!');
         $downloadLinks.show();
@@ -201,8 +206,6 @@
 
     var runTest = function() {
         results = [];
-        stats = [];
-
         $tableResults.find(tbody).empty();
         $tableStats.find(tbody).empty();
         $statusMsg.removeClass('green').addClass('red').text('Runing Test...');
@@ -227,15 +230,6 @@
         var totalToProcess = conditions.length * recSizes.length * runs,
             totalProcessed = 0;
 
-        var testFunc = {
-            TU: function(trainingData, testData, rsOptions) {
-                return rsTU.testRecommender(trainingData, testData, rsOptions);
-            },
-            POP: function(trainingData, testData, rsOptions) {
-                return rsPOP.testRecommender(trainingData, testData, rsOptions);
-            }
-        };
-
         function process(data, condIndex, recSizeIndex, run) {
 
             var algorithm = conditions[condIndex].alg,
@@ -250,20 +244,16 @@
             setTimeout(function(){
 
                 var rsOptions = { recSize: recSize, beta: beta };
-                var result = testFunc[algorithm](trainingData.slice(), testData.slice(), rsOptions);
+                var result = rsTester.testRecommender(algorithm, trainingData.slice(), testData.slice(), rsOptions);
+                //var result = testFunc[algorithm](trainingData.slice(), testData.slice(), rsOptions);
                 var algStr = beta != '-' ? algorithm + '(beta=' + beta + ')' : algorithm;
 
-                var rObj = {
+                results.push($.extend({
                     testNum: condIndex + 1,
                     algorithm: algStr,
                     recSize: recSize,
-                    run: run,
-                    recall: result.recall,
-                    precision: result.precision,
-                    hits: result.hits,
-                    timeLapse: result.timeLapse
-                };
-                results.push(rObj);
+                    run: run
+                }, result));
 
                 condIndex++;
                 if(condIndex == conditions.length) {
@@ -277,7 +267,7 @@
                     run++
                 }
                 if(run > runs) {
-                    return finishProcessing();
+                    return finishProcessing(_.keys(result));
                 }
 
                 return process(data, condIndex, recSizeIndex, run);

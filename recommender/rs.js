@@ -1,13 +1,15 @@
 
-//if(!Number.prototype.round)
-//    Number.prototype.round = function(places) {
-//        return +(Math.round(this + "e+" + places)  + "e-" + places);
-//    }
-
 if(!Math.roundTo)
     Math.roundTo = function(value, places) {
         return +(Math.round(value + "e+" + places)  + "e-" + places);
     }
+
+
+if(!Math.log2)
+    Math.log2 = function(value) {
+        return (Math.log(value) / Math.log(2));
+    }
+
 
 
 window.RS = (function(){
@@ -164,44 +166,6 @@ window.RS = (function(){
             this.userTagMatrix = {};
             this.maxTagAcrossDocs = {};
             this.maxTagAccrossUsers = {};
-        },
-
-        testRecommender: function(trainingData, testData, options) {
-            var o = $.extend({
-                recSize: 0,
-                beta: 0.5,
-                and: false,
-            }, options);
-
-            this.clear();
-
-            trainingData.forEach(function(d){
-                _this.addBookmark(d);
-            });
-
-            var hits = 0,       // == true positives
-                timeLapse = $.now();
-
-            testData.forEach(function(d){
-                var args = {
-                    user: d.user,
-                    keywords: d.keywords,
-                    options: o
-                };
-
-                var recs = _this.getRecommendations(args);
-                hits = (_.findIndex(recs, function(r){ return r.doc == d.doc }) > -1) ? hits + 1 : hits;
-            });
-
-            var result = {
-                hits: hits,
-                recall: Math.roundTo(hits/testData.length, 3),
-                precision: Math.roundTo(hits/(testData.length * o.recSize), 3),
-                timeLapse: $.now() -  timeLapse
-            };
-            console.log(result);
-
-            return result;
         },
 
         //  Miscelaneous
