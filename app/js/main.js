@@ -2,6 +2,39 @@
 
     var _this = this;
 
+
+    /**************************************/
+    //  uRank callback and options
+    var onUrankChange = function(rankingData, selectedKeywords) {
+        console.log('Testing Recommender');
+        _this.currentRecs = _this.RS.getRecommendations({ keywords: selectedKeywords });
+        console.log(_this.currentRecs);
+    };
+
+    var onFaviconClicked = function(documentId){
+    };
+
+    //  uRank initialization options
+    var urankInitOptions = {
+        tagCloudRoot: '#tagcloud',
+        tagBoxRoot: '#tagbox',
+        contentListRoot: '#contentlist',
+        visCanvasRoot: '#viscanvas',
+        docViewerRoot: '#docviewer',
+        onChange: onUrankChange
+    };
+
+    // urank load options
+    var urankLoadOptions = {
+        docViewer: {
+            misc: {
+                facetsToShow: ['year']
+            }
+        }
+    };
+
+    /**************************************/
+
     //  Prepare recommender data
     function addDataToRecommender() {
 
@@ -57,7 +90,7 @@
         _this.urank.clear();
         setTimeout(function(){
             _this.dsm.getDataset(datasetId, function(dataset){
-                _this.urank.loadData(dataset);
+                _this.urank.loadData(dataset, urankLoadOptions);
                 $('.processing-message').hide();
             });
         }, 10);
@@ -93,32 +126,10 @@
         });
     };
 
-    //  uRank callbacks
-    var onUrankChange = function(rankingData, selectedKeywords) {
-        console.log('Testing Recommender');
-        _this.currentRecs = _this.RS.getRecommendations({ keywords: selectedKeywords });
-        console.log(_this.currentRecs);
-    };
-
-    var onFaviconClicked = function(documentId){
-    };
-
-
-    //  uRank initialization options
-    var urankOptions = {
-        tagCloudRoot: '#tagcloud',
-        tagBoxRoot: '#tagbox',
-        contentListRoot: '#contentlist',
-        visCanvasRoot: '#viscanvas',
-        docViewerRoot: '#docviewer',
-        onChange: onUrankChange
-    };
-
-
     //  INITIALIZATION
     this.currentRecs = [];
     this.dsm = new datasetManager();
-    this.urank = new Urank(urankOptions);
+    this.urank = new Urank(urankInitOptions);
     this.RS = new RS();
 
     addDataToRecommender();

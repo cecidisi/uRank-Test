@@ -75,6 +75,8 @@ window.RS = (function(){
                 }
             }, args);
 
+            var alpha = function(x) { return  parseFloat(1 - Math.pow(Math.E, (-1 * x))) };
+
             //  Get neighbors
             var neighbors = [];
 
@@ -85,8 +87,8 @@ window.RS = (function(){
                         p.keywords.forEach(function(k){
                             if(_this.userTagMatrix[user][k.term]) {
                                 var normalizedFreq = _this.userTagMatrix[user][k.term] / _this.maxTagAccrossUsers[k.term];
-                                var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.userTagMatrix[user][k.term])));
-                                userScore += (normalizedFreq * k.weight * scalingFactor / p.keywords.length);
+                                //var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.userTagMatrix[user][k.term])));
+                                userScore += (normalizedFreq * k.weight * alpha(_this.userTagMatrix[user][k.term]) / p.keywords.length);
                             }
                         });
                         if(userScore > 0)
@@ -116,8 +118,8 @@ window.RS = (function(){
                         p.keywords.forEach(function(k){
                             if(_this.itemTagMatrix[doc][k.term]) {
                                 var normalizedFreq = _this.itemTagMatrix[doc][k.term] / _this.maxTagAcrossDocs[k.term];           // normalized item-tag frequency
-                                var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.itemTagMatrix[doc][k.term])));   // raises final score of items bookmarked many times
-                                var tagScore = (normalizedFreq * k.weight * scalingFactor / p.keywords.length);
+//                                var scalingFactor = 1 / (Math.pow(Math.E, (1 / _this.itemTagMatrix[doc][k.term])));   // raises final score of items bookmarked many times
+                                var tagScore = (normalizedFreq * k.weight * alpha(_this.itemTagMatrix[doc][k.term]) / p.keywords.length);
                                 tags[k.term] = { tagged: _this.itemTagMatrix[doc][k.term], score: tagScore };
                                 tagBasedScore += tagScore;
                             }

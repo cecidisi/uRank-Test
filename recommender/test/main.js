@@ -37,6 +37,7 @@
 
     function getTrainingAndTestData(pctg) {
 
+        var kwcount = 0;
         var kw_aux = [
             { query: 'women in workforce', keywords: ['participation&woman&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},       // 9
             { query: 'robot', keywords: ['autonomous&robot', 'human&interaction&robot', 'control&information&robot&sensor']},                                   // 7
@@ -68,6 +69,7 @@
                     q['selected-items'].forEach(function(d){
                         var usedKeywords = shuffle(keywords).slice(0, randomFromTo(2,keywords.length));
                         data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic });
+                        kwcount += usedKeywords.length;
                     });
                 });
             });
@@ -82,6 +84,7 @@
             d.keywords = d.keywords.map(function(k){ return { term: k, weight: 1 }; });
         });
 
+        console.log(kwcount);
         return { training: trainingData, test: testData };
     }
 

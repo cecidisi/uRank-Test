@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "jquery": "latest",
-    "urank": "latest",
-    "underscore": "latest"
+    "underscore": "latest",
+    "urank": "~0.0.3"
   }
 }

@@ -142,7 +142,7 @@ module.exports = function (grunt) {
 
 
     /*  UPDATE  */
-    grunt.registerTask('urank-update-all', [
+    grunt.registerTask('urank-update', [
         'bower-install-simple:urank-update',
         'wiredep:direct'
     ]);
