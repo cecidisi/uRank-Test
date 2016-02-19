@@ -31,7 +31,7 @@ window.RS = (function(){
         addBookmark: function(args) {
             var p = $.extend({ user: undefined, doc: undefined, keywords: undefined }, args);
 
-            if(p.user == undefined || p.doc == undefined || p.keywords == undefined)
+            if(!p.user || !p.doc || !p.keywords)
                 return 'Error -- parameter missing';
 
             //  update user-item matrix
@@ -71,7 +71,7 @@ window.RS = (function(){
                     beta: 0.5,
                     neighborhoodSize: 20,
                     and: false,
-                    recSize: 0
+                    k: 0
                 }
             }, args);
 
@@ -91,7 +91,7 @@ window.RS = (function(){
                                 userScore += (normalizedFreq * k.weight * alpha(_this.userTagMatrix[user][k.term]) / p.keywords.length);
                             }
                         });
-                        if(userScore > 0)
+                        if(userScore)
                             neighbors.push({ user: user, score: Math.roundTo(userScore, 3) });
                     }
                 });
@@ -158,7 +158,7 @@ window.RS = (function(){
                 return 0;
             });
 
-            var size = p.options.recSize == 0 ? recs.length : p.options.recSize;
+            var size = p.options.k ? p.options.k : recs.length;
             return recs.slice(0, size);
         },
 

@@ -6,25 +6,24 @@
 
     var $selectNumberTests = $('#select-number-tests'),
         $ckbPopAlg = $('#ckb-pop-alg'),
+        $ckbCbAlg = $('#ckb-cb-alg'),
         $selectPctgTraining = $('#select-pctg-training'),
-        $selectRuns = $('#select-runs'),
-        $selectRecSize = $('#select-rec-size'),
+        $selectIterations = $('#select-iterations'),
+        $selectTopN = $('#select-top-n'),
         $lblTrainingSize = $('#lbl-training-size'),
         $lblTestSize = $('#lbl-test-size'),
         $btnRun = $('#btn-run'),
         $tableResults = $('table#results'),
-        $tableStats = $('table#stats'),
         $statusMsg = $('#runing-status'),
         $downloadResultsJson = $('#download-results-json'),
         $downloadResultsCsv = $('#download-results-csv'),
-        $downloadStatsJson = $('#download-stats-json'),
-        $downloadStatsCsv = $('#download-stats-csv'),
         $downloadLinks = $('.download-link'),
         tbody = 'tbody',
         $testSections = $('.inner.test');
 
     var testSectionIdPrefix = '#test-';
 
+    var documents = [];
     var dataSize = 0;
     evaluationResults.forEach(function(d){
         d["tasks-results"].forEach(function(t){
@@ -33,6 +32,25 @@
             });
         });
     });
+
+
+    function loadDocumentsAndExtractKeywords(cb) {
+
+        var dsm = new DatasetManager();
+        var keywordExtractor = new KeywordExtractor();
+        var ds = dsm.getIDsAndDescriptions();
+        var done = 0;
+
+        for(var i=0; i<ds.length;++i) {
+            dsm.getDataset(ds[i].id, function(data){
+                documents = $.merge(documents, data);
+                if(++done === ds.length) {
+
+                    cb();
+                }
+            });
+        }
+    }
 
 
     function getTrainingAndTestData(pctg) {
@@ -68,7 +86,7 @@
 
                     q['selected-items'].forEach(function(d){
                         var usedKeywords = shuffle(keywords).slice(0, randomFromTo(2,keywords.length));
-                        data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic });
+                        data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic, task: (q['question-number'] < 3) ? 'focus' : 'broad' });
                         kwcount += usedKeywords.length;
                     });
                 });
@@ -89,54 +107,59 @@
     }
 
 
-    function getStdv(arr, mean) {
-        var sum = 0;
-        arr.forEach(function(a){
-            sum += Math.pow((a - mean), 2);
+//    function getStdv(arr, mean) {
+//        var sum = 0;
+//        arr.forEach(function(a){
+//            sum += Math.pow((a - mean), 2);
+//        });
+//        return Math.sqrt(sum / arr.length);
+//    }
+//
+//
+//    function processStats(metrics){
+//
+//        var stats = [];
+//        var tests = _.groupBy(results, function(r){ return r.testNum });
+//        var testNums = _.keys(tests);
+//
+//        testNums.forEach(function(testNum){//})
+//
+//            var aggregatedTest = _.groupBy(tests[testNum], function(t){ return t.k });
+//            _.keys(aggregatedTest).forEach(function(k){
+//
+//                var ceroMeans = {};
+//                metrics.forEach(function(metric){ ceroMeans[metric] = 0; });
+//
+//                var means = aggregatedTest[k].reduce(function(prev, cur, i, arr){
+//                    var obj = {};
+//                    metrics.forEach(function(metric){ obj[metric] = prev[metric] + (cur[metric]/arr.length) });
+//                    return obj;
+//                }, ceroMeans);
+//
+//                stats.push({
+//                    testNum: testNum,
+//                    algorithm: tests[testNum][0].algorithm,
+//                    k: k,
+//                    iterations: aggregatedTest[k].length
+//                });
+//
+//                metrics.forEach(function(metric){
+//                    stats[stats.length - 1][metric + 'Mean'] = Math.roundTo(means[metric], decPos);
+//                    stats[stats.length - 1][metric + 'Stdv'] = Math.roundTo(getStdv(aggregatedTest[k].map(function(l){ return l[metric] }), means[metric]), decPos);
+//                });
+//            });
+//        });
+//
+//        return stats;
+//    }
+
+
+    function fillTable($table, header, rows) {
+        $table.find('thead').empty();
+        header.forEach(function(h){
+            $('<th>'+h+'</th>').appendTo($table.find('thead'))
         });
-        return Math.sqrt(sum / arr.length);
-    }
 
-
-    function processStats(metrics){
-
-        var stats = [];
-        var tests = _.groupBy(results, function(r){ return r.testNum });
-        var testNums = _.keys(tests);
-
-        testNums.forEach(function(testNum){//})
-
-            var aggregatedTest = _.groupBy(tests[testNum], function(t){ return t.recSize });
-            _.keys(aggregatedTest).forEach(function(recSize){
-
-                var ceroMeans = {};
-                metrics.forEach(function(metric){ ceroMeans[metric] = 0; });
-
-                var means = aggregatedTest[recSize].reduce(function(prev, cur, i, arr){
-                    var obj = {};
-                    metrics.forEach(function(metric){ obj[metric] = prev[metric] + (cur[metric]/arr.length) });
-                    return obj;
-                }, ceroMeans);
-
-                stats.push({
-                    testNum: testNum,
-                    algorithm: tests[testNum][0].algorithm,
-                    recSize: recSize,
-                    totalRuns: aggregatedTest[recSize].length
-                });
-
-                metrics.forEach(function(metric){
-                    stats[stats.length - 1][metric + 'Mean'] = Math.roundTo(means[metric], decPos);
-                    stats[stats.length - 1][metric + 'Stdv'] = Math.roundTo(getStdv(aggregatedTest[recSize].map(function(l){ return l[metric] }), means[metric]), decPos);
-                });
-            });
-        });
-
-        return stats;
-    }
-
-
-    function fillTable($table, rows) {
         $table.find(tbody).empty();
         rows.forEach(function(row){
             var $row = $('<tr/>').appendTo($table.find(tbody));
@@ -153,15 +176,16 @@
         results = results.sort(function(r1, r2){
             if(r1.testNum < r2.testNum) return -1;
             if(r1.testNum > r2.testNum) return 1;
-            if(r1.recSize < r2.recSize) return -1;
-            if(r1.recSize > r2.recSize) return 1;
-            if(r1.run < r2.run) return -1;
-            if(r1.run > r2.run) return 1;
+            if(r1.k < r2.k) return -1;
+            if(r1.k > r2.k) return 1;
+            if(r1.iteration < r2.iteration) return -1;
+            if(r1.iteration > r2.iteration) return 1;
             return 0;
         })
 
-        var keys = ['testNum', 'algorithm', 'recSize', 'run'];
-        keys = $.merge(keys, metrics);
+//        var keys = ['testNum', 'algorithm', 'k', 'iteration'];
+//        keys = $.merge(keys, metrics);
+        var keys = _.keys(results[0]);
         var rows = new Array(results.length);
         results.forEach(function(r, i){
             rows[i] = new Array();
@@ -169,21 +193,21 @@
                 rows[i].push(r[keys[j]]);
             });
         });
-        fillTable($tableResults, rows);
+        fillTable($tableResults, keys, rows);
 
-        rows = new Array(stats.length);
-        keys = ['testNum', 'algorithm', 'recSize', 'totalRuns'];
-        stats = processStats(metrics);
-        stats.forEach(function(s, i){
-            rows[i] = new Array();
-            keys.forEach(function(key, j){
-                rows[i].push(s[keys[j]]);
-            });
-            metrics.forEach(function(metric){
-                rows[i].push(s[metric + 'Mean'] + '(' + s[metric + 'Stdv'] + ')');
-            });
-        });
-        fillTable($tableStats, rows);
+//        rows = new Array(stats.length);
+//        keys = ['testNum', 'algorithm', 'k', 'iterations'];
+//        stats = processStats(metrics);
+//        stats.forEach(function(s, i){
+//            rows[i] = new Array();
+//            keys.forEach(function(key, j){
+//                rows[i].push(s[keys[j]]);
+//            });
+//            metrics.forEach(function(metric){
+//                rows[i].push(s[metric + 'Mean'] + '(' + s[metric + 'Stdv'] + ')');
+//            });
+//        });
+//        fillTable($tableStats, rows);
 
         $statusMsg.removeClass('red').addClass('green').text('Test finished!');
         $downloadLinks.show();
@@ -210,34 +234,37 @@
     var runTest = function() {
         results = [];
         $tableResults.find(tbody).empty();
-        $tableStats.find(tbody).empty();
+//        $tableStats.find(tbody).empty();
         $statusMsg.removeClass('green').addClass('red').text('Runing Test...');
         $downloadLinks.hide();
 
         var numberTUTests = $selectNumberTests.val(),
-            recSizes = $selectRecSize.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
-            runs = $selectRuns.val(),
+            topNarray = $selectTopN.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
+            iterations = $selectIterations.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100),
-            betaValues = [],
-            conditions = [];
+            betaValues = [],    //  array of float
+            conditions = [];    //  array { alg:string, beta:float }
 
         //  Set conditions por TU tets and add POP test if checkbox is checked
         for(var i=1; i<=numberTUTests; i++ ) {
             betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
             conditions.push({ alg: 'TU', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
+            conditions.push({ alg: 'TU_ALT', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
         }
 
         if($ckbPopAlg.is(':checked'))
-            conditions.push({ alg: 'POP', beta: '-' });
+            conditions.push({ alg: 'POP', beta: 0 });
+//        if($ckbCbAlg.is(':checked'))
+//            conditions.push({ alg: 'CB', beta: 0 })
 
-        var totalToProcess = conditions.length * recSizes.length * runs,
+        var totalToProcess = conditions.length * topNarray.length * iterations,
             totalProcessed = 0;
 
-        function process(data, condIndex, recSizeIndex, run) {
+        function process(data, condIndex, kIndex, iteration) {
 
             var algorithm = conditions[condIndex].alg,
                 beta = conditions[condIndex].beta,
-                recSize = recSizes[recSizeIndex],
+                k = topNarray[kIndex],
                 trainingData = data.training,
                 testData = data.test,
                 message = 'Runing... ' + Math.roundTo((++totalProcessed)*100/totalToProcess, 1) + '% processed';
@@ -246,34 +273,47 @@
 
             setTimeout(function(){
 
-                var rsOptions = { recSize: recSize, beta: beta };
-                var result = rsTester.testRecommender(algorithm, trainingData.slice(), testData.slice(), rsOptions);
-                //var result = testFunc[algorithm](trainingData.slice(), testData.slice(), rsOptions);
-                var algStr = beta != '-' ? algorithm + '(beta=' + beta + ')' : algorithm;
+                var rsOptions = { k: k, beta: beta };
+                var result = rsTester.testRecommender(algorithm, trainingData.slice(), testData.slice(), rsOptions, iteration);
+                var algStr = beta ? algorithm + '(beta=' + beta + ')' : algorithm;
 
-                results.push($.extend({
-                    testNum: condIndex + 1,
-                    algorithm: algStr,
-                    recSize: recSize,
-                    run: run
-                }, result));
+                results = $.merge(results, result);
+//                results.push($.extend({
+//                    testNum: condIndex + 1,
+//                    algorithm: algStr,
+//                    k: k,
+//                    iteration: iteration
+//                }, result));
 
                 condIndex++;
                 if(condIndex == conditions.length) {
                     condIndex = 0;
-                    recSizeIndex++;
+                    kIndex++;
                     data = getTrainingAndTestData(pctg);
                 }
-                if(recSizeIndex == recSizes.length) {
+                if(kIndex == topNarray.length) {
                     condIndex = 0;
-                    recSizeIndex = 0;
-                    run++
+                    kIndex = 0;
+                    iteration++
                 }
-                if(run > runs) {
-                    return finishProcessing(_.keys(result));
+                if(iteration > iterations) {
+                    //return finishProcessing(_.keys(result));
+                    results = results.sort(function(r1, r2){
+                        if(r1.testNum < r2.testNum) return -1;
+                        if(r1.testNum > r2.testNum) return 1;
+                        if(r1.k < r2.k) return -1;
+                        if(r1.k > r2.k) return 1;
+                        if(r1.iteration < r2.iteration) return -1;
+                        if(r1.iteration > r2.iteration) return 1;
+                        return 0;
+                    });
+
+                    $statusMsg.removeClass('red').addClass('green').text('Test finished!');
+                    $downloadLinks.show();
+                    return;
                 }
 
-                return process(data, condIndex, recSizeIndex, run);
+                return process(data, condIndex, kIndex, iteration);
             }, 1);
         }
 
@@ -317,11 +357,10 @@
     $btnRun.on('click', runTest);
     $selectNumberTests.on('change', selectNumberTestsChanged).trigger('change');
     $testSections.find('.spinner-beta').spinner({ min: 0, max: 1, step: 0.05 });
-    $selectRecSize.multipleSelect();
+    $selectTopN.multipleSelect();
     $selectPctgTraining.on('change', pctgTrainingSelectChanged).trigger('change');
 
     $downloadResultsJson.click(function(){ downloadData('test_results', 'json', JSON.stringify(results)) });
     $downloadResultsCsv.click(function(){ downloadData('test-results', 'csv', getCsv(results)) });
-    $downloadStatsJson.click(function(){ downloadData('statistics', 'json', JSON.stringify(stats)) });
-    $downloadStatsCsv.click(function(){ downloadData('statistics', 'csv', getCsv(stats)) });
+
 })();

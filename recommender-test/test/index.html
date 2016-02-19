@@ -38,6 +38,12 @@
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
                 </select>
             </div>
 
@@ -76,24 +82,68 @@
                 </div>
                 <input class="spinner-beta" name="value" value="0.5" />
             </div>
+            <div class="inner test" id="test-6">
+                <div class="label-wrapper">
+                    <label>Test 6. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-7">
+                <div class="label-wrapper">
+                    <label>Test 7. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-8">
+                <div class="label-wrapper">
+                    <label>Test 8. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-1">
+                <div class="label-wrapper">
+                    <label>Test 9. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-10">
+                <div class="label-wrapper">
+                    <label>Test 10. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-11">
+                <div class="label-wrapper">
+                    <label>Test 11. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
 
             <div class="delimiter"></div>
 
             <!-- POP algorithm selection -->
             <div class="inner">
                 <div class="label-wrapper">
-                    <label title="Test against most popular RS">Test POP-RS </label>
+                    <label title="Test against most popular RS">Test MP </label>
                 </div>
                 <input type="checkbox" id="ckb-pop-alg" checked="checked" />
+            </div>
+
+            <!-- CB algorithm selection -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against content-based RS">Test CB </label>
+                </div>
+                <input type="checkbox" id="ckb-cb-alg" checked="checked" />
             </div>
 
             <div class="delimiter"></div>
             <!-- Recommendation set size  -->
             <div class="inner">
                 <div class="label-wrapper">
-                    <label title="Number of recommendations to be returned by RS">Rec. Size: </label>
+                    <label title="Number of recommendations to be returned by RS">Top-N: </label>
                 </div>
-                <select class="select" id="select-rec-size" multiple="multiple">
+                <select class="select" id="select-top-n" multiple="multiple">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3" selected="selected">3</option>
@@ -115,7 +165,7 @@
                 <div class="label-wrapper">
                     <label title="Runs per recommendation size selected">Runs: </label>
                 </div>
-                <select class="select" id="select-runs">
+                <select class="select" id="select-iterations">
                     <option value="1">1</option>
                     <option value="3" selected>3</option>
                     <option value="5">5</option>
@@ -162,66 +212,19 @@
         </div>
 
 
-
-        <div class="table-panel">
-            <div class="section-header">
-                <span>General Statistics</span>
-                <a class="download-link" id="download-stats-csv" href="#">&darr;csv</a>
-                <a class="download-link" id="download-stats-json" href="#">&darr;json</a>
-            </div>
-            <div class="table-container">
-                <table id="stats">
-                    <thead>
-                        <tr>
-                            <th>#Test</th>
-                            <th>Algorithm</th>
-                            <th>Rec. Size</th>
-                            <th>Total Runs</th>
-                            <th>Hits mean(stdv)</th>
-                            <th>Recall mean(stdv)</th>
-                            <th>Precision mean(stdv)</th>
-                            <th>F1 mean(stdv)</th>
-                            <th>RankScore mean(stdv)</th>
-                            <th>NDCG mean(stdv)</th>
-                            <th>Time Lapse mean(stdv)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-
         <div class="table-panel">
             <div class="section-header">
                 <span>Test Results</span>
-                <a class="download-link" id="download-results-csv" href="#">&darr;csv</a>
-                <a class="download-link" id="download-results-json" href="#">&darr;json</a>
+                <a id="download-results-csv" class="download-link" for="#results" ext="csv" href="#">&darr;csv</a>
+                <a id="download-results-json" class="download-link" for="#results" ext="json" href="#">&darr;json</a>
             </div>
             <div class="table-container">
                 <table id="results">
-                    <thead>
-                        <tr>
-                            <th>#Test</th>
-                            <th>Algorithm</th>
-                            <th>Rec. Size</th>
-                            <th>#Run</th>
-                            <th>Hits</th>
-                            <th>Recall</th>
-                            <th>Precision</th>
-                            <th>F1</th>
-                            <th>RankScore</th>
-                            <th>NDCG</th>
-                            <th>Time Lapse</th>
-                        </tr>
-                    </thead>
+                    <thead></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
-
-
-
 
 
         <!--Bower scripts-->
@@ -232,6 +235,7 @@
         <!-- App scripts -->
         <script type="text/javascript" src="../rs.js" charset="utf-8"></script>
         <script type="text/javascript" src="rs-pop.js" charset="utf-8"></script>
+        <script type="text/javascript" src="rs-alt.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../app/js/evaluation-results.js" charset="utf-8"></script>
         <script type="text/javascript" src="../../app/js/file-generator.js" charset="utf-8"></script>
         <script type="text/javascript" src="libs/multiple-select-master/jquery.multiple.select.js" charset="utf-8"></script>

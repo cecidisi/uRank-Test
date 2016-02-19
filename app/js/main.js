@@ -128,7 +128,7 @@
 
     //  INITIALIZATION
     this.currentRecs = [];
-    this.dsm = new datasetManager();
+    this.dsm = new DatasetManager();
     this.urank = new Urank(urankInitOptions);
     this.RS = new RS();
 

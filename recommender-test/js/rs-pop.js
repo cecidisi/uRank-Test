@@ -25,7 +25,7 @@ window.RSpop = (function(){
         addBookmark: function(args) {
             var p = $.extend({ doc: undefined, topic: undefined }, args);
 
-            if(p.doc == undefined || p.topic == undefined)
+            if(!p.doc || !p.topic)
                 return 'Error -- parameter missing';
 
             if(!this.topicItemMatrix[p.topic])
@@ -37,7 +37,7 @@ window.RSpop = (function(){
         getRecommendations: function(args) {
             var p = $.extend(true, {
                 topic: '',
-                recSize: 0
+                options: { k: 0 }
             }, args);
 
             var recs = [];
@@ -51,14 +51,13 @@ window.RSpop = (function(){
                 return 0;
             });
 
-            var size = p.options.recSize == 0 ? recs.length : p.options.recSize;
+            var size = p.options.k == 0 ? recs.length : p.options.k;
             return recs.slice(0, size);
         },
 
         clear: function() {
             this.topicItemMatrix = {};
-        },
-
+        }
     };
 
     return RSpop;

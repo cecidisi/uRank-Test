@@ -1,6 +1,6 @@
 
 
-function datasetManager(){
+function DatasetManager(){
 
     var datasetMappings = {
 

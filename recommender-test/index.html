@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>uRank Test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="style/main.css" />
+        <link rel="stylesheet" href="../bower_components/jquery-ui/themes/base/spinner.css" />
+        <link rel="stylesheet" href="../bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css" />
+
+        <link rel="stylesheet" href="../app/css/main-style.css" />
+<!--        <link rel="stylesheet" href="libs/multiple-select-master/docs/css/base.css" />-->
+        <link rel="stylesheet" href="libs/multiple-select-master/docs/assets/flatdoc/theme-white/style.css" />
+        <link rel="stylesheet" href="libs/multiple-select-master/multiple-select.css" />
+    </head>
+
+    <body>
+
+        <div class="settings-panel">
+
+            <div class="inner">
+                <input type="button" class="my-button" id="btn-run" value="Run Test" />
+                <span id="runing-status"></span>
+                <!--                <div id="spinner" class="spinner-running"></div>-->
+            </div>
+
+            <div class="delimiter"></div>
+            <!--   Number of tests-->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title=""># TU-RS Tests: </label>
+                </div>
+                <select class="select" id="select-number-tests" >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11" selected>11</option>
+                </select>
+            </div>
+
+            <!--  beta spinners  -->
+            <div class="inner test" id="test-1">
+                <div class="label-wrapper">
+                    <label>Test 1. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.0" />
+            </div>
+
+            <div class="inner test" id="test-2" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 2. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.1" />
+            </div>
+
+            <div class="inner test" id="test-3" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 3. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.2" />
+            </div>
+
+            <div class="inner test" id="test-4" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 4. &beta; =  </label>
+                </div>
+                <input class="spinner-beta"name="value" value="0.3" />
+            </div>
+
+            <div class="inner test" id="test-5" style="display: none;">
+                <div class="label-wrapper">
+                    <label>Test 5. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.4" />
+            </div>
+            <div class="inner test" id="test-6">
+                <div class="label-wrapper">
+                    <label>Test 6. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.5" />
+            </div>
+            <div class="inner test" id="test-7">
+                <div class="label-wrapper">
+                    <label>Test 7. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.6" />
+            </div>
+            <div class="inner test" id="test-8">
+                <div class="label-wrapper">
+                    <label>Test 8. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.7" />
+            </div>
+            <div class="inner test" id="test-9">
+                <div class="label-wrapper">
+                    <label>Test 9. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.8" />
+            </div>
+            <div class="inner test" id="test-10">
+                <div class="label-wrapper">
+                    <label>Test 10. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="0.9" />
+            </div>
+            <div class="inner test" id="test-11">
+                <div class="label-wrapper">
+                    <label>Test 11. &beta; =  </label>
+                </div>
+                <input class="spinner-beta" name="value" value="1.0" />
+            </div>
+
+            <div class="delimiter"></div>
+
+            <!-- POP algorithm selection -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against most popular RS">Test MP </label>
+                </div>
+                <input type="checkbox" id="ckb-pop-alg" checked="checked" />
+            </div>
+
+            <!-- CB algorithm selection -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against content-based RS">Test CB </label>
+                </div>
+                <input type="checkbox" id="ckb-cb-alg" checked="checked" />
+            </div>
+
+            <div class="delimiter"></div>
+            <!-- Recommendation set size  -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Number of recommendations to be returned by RS">Top-N: </label>
+                </div>
+                <select class="select" id="select-top-n" multiple="multiple">
+                    <option value="1" selected>1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4" selected>4</option>
+                    <option value="5" selected>5</option>
+                    <option value="6" selected>6</option>
+                    <option value="7" selected>7</option>
+                    <option value="8" selected>8</option>
+                    <option value="9" selected>9</option>
+                    <option value="10" selected>10</option>
+                    <option value="12">12</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
+
+            <div class="delimiter"></div>
+            <!--    Number of runs  -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Runs per recommendation size selected">Runs: </label>
+                </div>
+                <select class="select" id="select-iterations">
+                    <option value="1" selected>1</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <div class="delimiter"></div>
+            <!--    Training dataset size   -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label>% Training data: </label>
+                </div>
+                <select class="select" id="select-pctg-training">
+                    <option value="60">60</option>
+                    <option value="65">65</option>
+                    <option value="70" selected>70</option>
+                    <option value="75">75</option>
+                    <option value="80">80</option>
+                </select>
+            </div>
+
+            <!--    Training and test datasets size indicators  -->
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label>Training dataset size: </label>
+                </div>
+                <span id="lbl-training-size" class="red"></span>
+            </div>
+
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label>Test dataset size: </label>
+                </div>
+                <span id="lbl-test-size" class="red"></span>
+            </div>
+
+            <div class="inner">
+                <label>NOTE: Each #Run uses the same test data sample accross algortihm and rec. size</label>
+            </div>
+        </div>
+
+
+        <div class="table-panel">
+            <div class="section-header">
+                <span>Test Results</span>
+                <a id="download-results-csv" class="download-link" for="#results" ext="csv" href="#">&darr;csv</a>
+                <a id="download-results-json" class="download-link" for="#results" ext="json" href="#">&darr;json</a>
+            </div>
+            <div class="table-container">
+                <table id="results">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!--Bower scripts-->
+        <script src="../bower_components/jquery/dist/jquery.js"></script>
+        <script src="../bower_components/jquery-ui/jquery-ui.min.js"></script>
+        <script src="../bower_components/underscore/underscore.js"></script>
+
+        <!-- App scripts -->
+        <script type="text/javascript" src="libs/multiple-select-master/jquery.multiple.select.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../app/js/dataset-manager.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../app/js/evaluation-results.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../app/js/file-generator.js" charset="utf-8"></script>
+        <script type="text/javascript" src="libs/natural-custom.js" charset="utf-8"></script>
+        <script type="text/javascript" src="libs/pos/lexicon.js" charset="utf-8"></script>
+        <script type="text/javascript" src="libs/pos/lexer.js" charset="utf-8"></script>
+        <script type="text/javascript" src="libs/pos/pos.js" charset="utf-8"></script>
+        <script type="text/javascript" src="libs/pos/POSTagger.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/documents.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/utils.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/keywordExtractor.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-pop.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-alt.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-cb.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-tester.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/main.js" charset="utf-8"></script>
+    </body>
+</html>

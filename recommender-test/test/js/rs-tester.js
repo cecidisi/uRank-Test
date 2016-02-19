@@ -19,6 +19,7 @@ window.RStester = (function(){
         _this = this;
         this.RS = {
             TU: new RS(),
+            TU_ALT: new RSalt(),
             POP: new RSpop()
         }
     }
@@ -34,22 +35,21 @@ window.RStester = (function(){
             return rank == 1 ? 1.00 : (1 / Math.log2(rank));
         },
 
-        testRecommender: function(recommender, trainingData, testData, options) {
+        testRecommender: function(recommender, trainingData, testData, options, iteration) {
             var o = $.extend({
-                recSize: 0,
-                beta: 0.5,
-                and: false,
+                k: 0,
+                beta: 0.5
             }, options);
 
             var rs = this.RS[recommender] || this.RS.TU;
 
             rs.clear();
 
-            trainingData.forEach(function(d){
-                rs.addBookmark(d);
-            });
+            // Set training set
+            trainingData.forEach(function(d){ rs.addBookmark(d); });
 
-            var hits = 0,       // == true positives
+            var results = [],
+                hits = 0,       // == true positives
                 rankScore = 0,
                 ndcg = 0,
                 timeLapse = $.now();
@@ -70,21 +70,36 @@ window.RStester = (function(){
                     rankScore += _this.getRankScore(rank);
                     ndcg += _this.getNDCG(rank);
                 }
+                results.push({
+                    rs: recommender,
+                    beta: o.beta,
+                    k: o.k,
+                    topic: d.topic,
+                    task: d.task,
+                    iteration: iteration,
+                    hit: rank ? true : false,
+                    rank: rank,
+                    user: d.user,
+                    item: d.doc,
+                    keywords: d.keywords.map(function(k){ return k.term }).join(', ')
+                });
 
             });
 
             var recall = Math.roundTo(hits/testData.length, 3),
                 precision = Math.roundTo(hits/(testData.length * o.recSize), 3);
 
-            return {
-                hits: hits,
-                recall: recall,
-                precision: precision,
-                f1: Math.roundTo(2 * (precision * recall / (precision + recall)), 3),
-                rankScore: Math.roundTo(rankScore/testData.length, 3),
-                ndcg: Math.roundTo(ndcg/testData.length, 3),
-                time: $.now() -  timeLapse
-            };
+            return results;
+//            console.log(results);
+//            return {
+//                hits: hits,
+//                recall: recall,
+//                precision: precision,
+//                f1: Math.roundTo(2 * (precision * recall / (precision + recall)), 3),
+//                rankScore: Math.roundTo(rankScore/testData.length, 3),
+//                ndcg: Math.roundTo(ndcg/testData.length, 3),
+//                time: $.now() -  timeLapse
+//            };
 
         }
 

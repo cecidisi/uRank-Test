@@ -89,7 +89,9 @@
 
 .table-panel {
     max-width: calc(72% - 40px);
-    height: calc(50% - 40px);
+/*    height: calc(50% - 40px);*/
+    height: calc(100% - 80px);
+    shape-margin: 40px;
     overflow-y: hidden;
     display: inline-block;
     float: left;
