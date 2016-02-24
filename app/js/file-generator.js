@@ -4,7 +4,7 @@
 
     $.generateFile = function(options){
 
-        console.log(options);
+        console.log('Downloading --> ' + options.filename);
         options = options || {};
 
         if(!options.script || !options.filename || !options.content){

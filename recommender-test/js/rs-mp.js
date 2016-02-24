@@ -1,26 +1,18 @@
 
 if(!Math.roundTo)
-    Math.roundTo = function(value, places) {
-        return +(Math.round(value + "e+" + places)  + "e-" + places);
-    }
+    Math.roundTo = function(value, places) { return +(Math.round(value + "e+" + places)  + "e-" + places); }
 
-if(!Math.log2)
-    Math.log2 = function(value) {
-        return (Math.log(value) / Math.log(2));
-    }
-
-
-window.RSpop = (function(){
+window.RS_MP = (function(){
 
     var _this;
     //  cosntructor
-    function RSpop() {
+    function RS_MP() {
         _this = this;
         this.topicItemMatrix = {};
     }
 
 
-    RSpop.prototype = {
+    RS_MP.prototype = {
 
         addBookmark: function(args) {
             var p = $.extend({ doc: undefined, topic: undefined }, args);
@@ -60,5 +52,5 @@ window.RSpop = (function(){
         }
     };
 
-    return RSpop;
+    return RS_MP;
 })();

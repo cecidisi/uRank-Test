@@ -33,7 +33,7 @@
                     <label title=""># TU-RS Tests: </label>
                 </div>
                 <select class="select" id="select-number-tests" >
-                    <option value="1">1</option>
+                    <option value="1" selected>1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
@@ -43,7 +43,7 @@
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
-                    <option value="11" selected>11</option>
+                    <option value="11">11</option>
                 </select>
             </div>
 
@@ -59,34 +59,34 @@
                 <div class="label-wrapper">
                     <label>Test 2. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.1" />
+                <input class="spinner-beta" name="value" value="0.2" />
             </div>
 
             <div class="inner test" id="test-3" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 3. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.2" />
+                <input class="spinner-beta" name="value" value="0.4" />
             </div>
 
             <div class="inner test" id="test-4" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 4. &beta; =  </label>
                 </div>
-                <input class="spinner-beta"name="value" value="0.3" />
+                <input class="spinner-beta"name="value" value="0.6" />
             </div>
 
             <div class="inner test" id="test-5" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 5. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.4" />
+                <input class="spinner-beta" name="value" value="0.8" />
             </div>
             <div class="inner test" id="test-6">
                 <div class="label-wrapper">
                     <label>Test 6. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.5" />
+                <input class="spinner-beta" name="value" value="1.0" />
             </div>
             <div class="inner test" id="test-7">
                 <div class="label-wrapper">
@@ -149,11 +149,11 @@
                     <option value="3" selected>3</option>
                     <option value="4" selected>4</option>
                     <option value="5" selected>5</option>
-                    <option value="6" selected>6</option>
-                    <option value="7" selected>7</option>
-                    <option value="8" selected>8</option>
-                    <option value="9" selected>9</option>
-                    <option value="10" selected>10</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
                     <option value="12">12</option>
                     <option value="15">15</option>
                 </select>
@@ -215,6 +215,10 @@
         <div class="table-panel">
             <div class="section-header">
                 <span>Test Results</span>
+                <a id="download-bookmarks" href="#">&darr;Bookmarks</a>
+                <a id="download-recs" href="#">&darr;Recommendations</a>
+                <a id="download-documents" href="#">&darr;Documents</a>
+                <a id="download-documents-dict" href="#">&darr;Documents Dict</a>
                 <a id="download-results-csv" class="download-link" for="#results" ext="csv" href="#">&darr;csv</a>
                 <a id="download-results-json" class="download-link" for="#results" ext="json" href="#">&darr;json</a>
             </div>
@@ -243,10 +247,11 @@
         <script type="text/javascript" src="libs/pos/pos.js" charset="utf-8"></script>
         <script type="text/javascript" src="libs/pos/POSTagger.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/documents.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/bookmarks.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/utils.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/keywordExtractor.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/rs.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/rs-pop.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-tu.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-mp.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/rs-alt.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/rs-cb.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/rs-tester.js" charset="utf-8"></script>
