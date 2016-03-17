@@ -224,9 +224,6 @@
             iterations = $selectIterations.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100),
             betaValues = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],    //  array of float
-//            tucbParams = [
-//                { alpha: }
-//            ],
             conditions = [];    //  array { alg:string, beta:float }
 
         //  Set conditions por TU tets and add POP test if checkbox is checked
@@ -244,8 +241,8 @@
 //            conditions.push({ alg: 'TU', beta: beta });
             conditions.push({ alg: 'ALT_2', beta: beta });    
             if($ckbAlt.is(':checked')) {
-                conditions.push({ alg: 'TU', beta: beta });
-                conditions.push({ alg: 'TU_2', beta: beta });
+//               conditions.push({ alg: 'TU', beta: beta });
+//                conditions.push({ alg: 'TU_2', beta: beta });
                 conditions.push({ alg: 'ALT', beta: beta });
 //                conditions.push({ alg: 'ALT_2', beta: beta });    
             }
@@ -255,8 +252,6 @@
             conditions.push({ alg: 'MP', beta: -1 });
         if($ckbCB.is(':checked'))
             conditions.push({ alg: 'CB', beta: -1 });
-            
-        conditions.push({ alg: 'TUCB', beta: -1 });
 
         //var totalToProcess = conditions.length * topNarray.length * iterations,
         var totalToProcess = conditions.length * iterations,

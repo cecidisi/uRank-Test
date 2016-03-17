@@ -68,7 +68,8 @@ window.RStester = (function(){
             var rs = this.RS[recommender] || this.RS.TU;
             rs.clear();
 
-            console.log(recommender);
+            console.log(iteration + '. ' +  recommender + ' ' + (o.beta > -1 ? ('(ß='+o.beta+')') : '' ) );
+            var tmsp = $.now();
             // Set training set
             trainingData.forEach(function(d){ rs.addBookmark(d); });
 
@@ -108,6 +109,7 @@ window.RStester = (function(){
 
             });
 
+            console.log('Time lapse = ' + ($.now() - tmsp));
             return results;
         }
 

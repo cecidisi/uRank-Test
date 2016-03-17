@@ -1,0 +1,426 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"fre",
+				"freq"
+			],
+			[
+				"ite",
+				"itemTagMatrix"
+			],
+			[
+				"sin",
+				"simDocuments"
+			],
+			[
+				"simD",
+				"simDoc"
+			],
+			[
+				"docs",
+				"docSimilarityMatrix"
+			],
+			[
+				"user",
+				"userItemMatrix"
+			],
+			[
+				"unio",
+				"unionTerms"
+			],
+			[
+				"key",
+				"keywords"
+			],
+			[
+				"tf",
+				"tfidf1"
+			],
+			[
+				"docsi",
+				"docSimilarity"
+			],
+			[
+				"doc",
+				"docSimilarityMatrix"
+			],
+			[
+				"simi",
+				"similarity"
+			],
+			[
+				"docsimila",
+				"docSimilarityMatrix"
+			],
+			[
+				"us",
+				"userItemMatrix"
+			],
+			[
+				"docsimi",
+				"docSimilarityMatrix"
+			],
+			[
+				"docu",
+				"documents"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "recommender-test/js/rs-alt-2.js",
+			"settings":
+			{
+				"buffer_size": 11974,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "recommender-test/js/rs-tu-2.js",
+			"settings":
+			{
+				"buffer_size": 9244,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "recommender-test/js/rs-tester.js",
+			"settings":
+			{
+				"buffer_size": 3775,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "recommender-test/js/main.js",
+			"settings":
+			{
+				"buffer_size": 15590,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "git",
+		"selected_items":
+		[
+			[
+				"git",
+				"Git: Status"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 416.0
+	},
+	"console":
+	{
+		"height": 362.0,
+		"history":
+		[
+			"git branch",
+			"git status",
+			"git pull",
+			"git commit -a -m \"Adding document ismilarity to scores\"",
+			"git -a -m \"Adding document ismilarity to scores\"",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Ampps/www/uRank-Test",
+		"/C/Ampps/www/uRank-Test/recommender-test",
+		"/C/Ampps/www/uRank-Test/recommender-test/js",
+		"/C/Ampps/www/uRank-Test/server",
+		"/C/Ampps/www/uRank-Test/server/tests"
+	],
+	"file_history":
+	[
+		"/C/Ampps/www/uRank-Test/recommender-test/js/tucb.js",
+		"/C/Ampps/www/uRank-Test/recommender-test/js/rs-alt-2.js",
+		"/C/Ampps/www/uRank-Test/recommender-test/js/utils.js"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"similarDocs",
+			"alpha",
+			"getEuclidenNorm",
+			"docSimilarityMatrix",
+			"userBasedScore",
+			"expSumTags",
+			"itemTagsExpSum",
+			"_data",
+			"relTermFrequencies"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"growthFun",
+			"_this.data",
+			"keywords"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "recommender-test/js/rs-alt-2.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11974,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2360,
+								2360
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 450.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "recommender-test/js/rs-tu-2.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9244,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								414,
+								414
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "recommender-test/js/rs-tester.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3775,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3700,
+								3700
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 990.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "recommender-test/js/main.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15590,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10085,
+								10085
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3015.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 100.0
+	},
+	"pinned_build_system": "",
+	"project": "uRank-Test sublime.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"main",
+				"recommender-test\\js\\main.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 249.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
