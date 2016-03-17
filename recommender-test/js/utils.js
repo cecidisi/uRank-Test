@@ -1,47 +1,11 @@
 
-/**
- * parsing functions
- *
- * */
-
-function parseDate( dateString ){
-    'use strict';
-
-    if(dateString instanceof Date)
-        return dateString;
-
-	var yearFormat = d3.time.format("%Y");
-	var date = yearFormat.parse(dateString);
-
-	if(date != null) return date;
-
-	var dateFormat = d3.time.format("%Y-%m");
-	date = dateFormat.parse(dateString);
-
-	if(date != null) return date;
-
-	if( dateString.length == 8 )
-		date = yearFormat.parse( dateString.substring(0, 4) );
-
-	if(date != null) return date;
-
-	if(dateString.contains("c "))
-		date = yearFormat.parse( dateString.substring(2, 6) );
-
-	if(date != null) return date;
-	return yearFormat.parse('2014');
-}
-
-
-
-function toYear(date){
-
-	var formatYear = d3.time.format("%Y");
-	var year = formatYear(date);
-	//if(year != null)
-		return year;
-	//return "0";
-}
+var getEuclidenNorm = function(docKeywords) {
+    var acumSquares = 0;
+    Object.keys(docKeywords).forEach(function(k){
+        acumSquares += docKeywords[k] * docKeywords[k];
+    });
+    return Math.sqrt(acumSquares);
+};
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

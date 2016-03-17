@@ -1,9 +1,3 @@
-
-if(!Math.roundTo)
-    Math.roundTo = function(value, places) { return +(Math.round(value + "e+" + places)  + "e-" + places);
-}
-
-
 window.RS_CB = (function(){
 
     var _this;
@@ -33,19 +27,18 @@ window.RS_CB = (function(){
             }, args);
 
             var recs = [];
-            var _data = window.documents.slice();
+            var _data = $.extend(true, {}, window.documents);
 
             if(p.keywords && p.keywords.length > 0) {
-                _data.forEach(function(d, i) {
-
+                Object.keys(_data).forEach(function(docId, i) {
+                    var d = _data[docId];
                     var docNorm = getEuclidenNorm(d.keywords);
                     var unitQueryVectorDot = parseFloat(1.00/Math.sqrt(p.keywords.length));
                     var score = 0;
                     p.keywords.forEach(function(q) {
                         // termScore = tf-idf(d, t) * unitQueryVector(t) * weight(query term) / |d|   ---    |d| = euclidenNormalization(d)
                         if(d.keywords[q.term])
-                            score += ((parseFloat(d.keywords[q.term]) / docNorm) * unitQueryVectorDot * parseFloat(q.weight)).round(3);
-                        // if item doesn't contain query term => maxScore and overallScore are not changed
+                            score += ((parseFloat(d.keywords[q.term]) / docNorm) * unitQueryVectorDot * parseFloat(q.weight));
                     });
                     recs.push({ doc: d.id, score: score });
                 });

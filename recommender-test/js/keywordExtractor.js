@@ -17,7 +17,8 @@ var KeywordExtractor = (function(){
             minDocFrequency: 2,
             minRepetitionsInDocument: 1,
             maxKeywordDistance: 5,
-            minRepetitionsProxKeywords: 4
+            minRepetitionsProxKeywords: 4,
+            minRepAdjectives: 2
         }, arguments);
         _this = this;
         this.collection = [];
@@ -50,58 +51,28 @@ var KeywordExtractor = (function(){
 
         //POS tagging
         collection.forEach(function(d, i) {
-            d.taggedWords = tagger.tag(lexer.lex(d.text));
-        });
-
-        // Find out which adjectives are potentially important and worth keeping
-        var keyAdjectives = getKeyAdjectives(collection);
-
-        // Create each item's document to be processed by tf*idf
-        collection.forEach(function(d) {
-            d.tokens = getFilteredTokens(d.taggedWords, keyAdjectives);                                       // d.tokens contains raw nouns and important adjectives
+            var taggedWords = tagger.tag(lexer.lex(d.text));
+            d.tokens = getFilteredTokens(taggedWords);                                                      // d.tokens contains raw nouns and important adjectives
             tfidf.addDocument(d.tokens.map(function(term){ return term.stem(); }).join(' '));                 // argument = string of stemmed terms in document array
         });
 
         // Save keywords for each document
         var documentKeywords = [];
         collection.forEach(function(d, i){
-            documentKeywords.push(getDocumentKeywords(i));
+            var docKeywords = {};
+            tfidf.listTerms(i).forEach(function(item){
+                if(isNaN(item.term) && parseFloat(item.tfidf) > 0 )
+                    docKeywords[item.term] = item.tfidf;
+            });
+            documentKeywords.push(docKeywords);
         });
-
         return documentKeywords;
     };
 
 
-
-    var getKeyAdjectives = function(_collection) {
-
-        var candidateAdjectives = [],
-            keyAdjectives = [];
-
-        _collection.forEach(function(d, i) {
-            // Find out which adjectives are potentially important and worth keeping
-            d.taggedWords.forEach(function(tw){
-                if(tw[1] == 'JJ'){
-                    var adjIndex = _.findIndex(candidateAdjectives, function(ca){ return ca.adj === tw[0].toLowerCase() });
-                    if(adjIndex == -1)
-                        candidateAdjectives.push({ 'adj': tw[0].toLowerCase(), 'repeated': 1 });
-                    else
-                        candidateAdjectives[adjIndex].repeated++;
-                }
-            });
-        });
-
-        candidateAdjectives.forEach(function(ca){
-            if(ca.repeated >= parseInt(_collection.length * 0.25))
-                keyAdjectives.push(ca.adj);
-        });
-        return keyAdjectives;
-    }
-
-
     // Filter out meaningless words, keeping only nouns (plurals are singularized) and key adjectives
-    var getFilteredTokens = function(taggedWords, keyAdjectives) {
-        var filteredTerms = [];
+    var getFilteredTokens = function(taggedWords/*, keyAdjectives*/) {
+        var filteredTerms = [], adjectives = {};
         taggedWords.forEach(function(tw){
             switch(tw[1]){
                 case POS.NN:          // singular noun
@@ -114,24 +85,17 @@ var KeywordExtractor = (function(){
                     tw[0] = (tagger.wordInLexicon(tw[0].toLowerCase())) ? tw[0].toLowerCase().singularizeNoun() : tw[0];
                     filteredTerms.push(tw[0]); break;
                 case POS.JJ:
-                    if(keyAdjectives.indexOf(tw[0]) > -1)
-                        filteredTerms.push(tw[0]); break;
+                    adjectives[tw[0]] = adjectives[tw[0]] ? adjectives[tw[0]] + 1 : 1;
+                    break;
             }
         });
+        //get frequent adjectives
+        Object.keys(adjectives).forEach(function(adj){
+            if(adjectives[adj] >= s.minRepAdjectives)
+                filteredTerms.push(adj);
+        })
         return filteredTerms;
     }
-
-
-    var getDocumentKeywords = function(dIndex) {
-        var docKeywords = {};
-
-        tfidf.listTerms(dIndex).forEach(function(item){
-            if(isNaN(item.term) && parseFloat(item.tfidf) > 0 )
-                docKeywords[item.term] = item.tfidf;
-        });
-        return docKeywords;
-    }
-
 
 
 
@@ -328,7 +292,7 @@ var KeywordExtractor = (function(){
             this.documentKeywords = [];
             this.collectionKeywords = [];
             this.collectionKeywordsDict = {};
-        }
+        }        
     };
 
     return KeywordExtractor;

@@ -23,11 +23,13 @@
             <div class="inner">
                 <input type="button" class="my-button" id="btn-run" value="Run Test" />
                 <span id="runing-status"></span>
-                <!--                <div id="spinner" class="spinner-running"></div>-->
             </div>
 
-            <div class="delimiter"></div>
+<!--            <div class="delimiter"></div>
+-->
+            
             <!--   Number of tests-->
+<!--
             <div class="inner">
                 <div class="label-wrapper">
                     <label title=""># TU-RS Tests: </label>
@@ -46,8 +48,10 @@
                     <option value="11">11</option>
                 </select>
             </div>
+-->
 
             <!--  beta spinners  -->
+<!--
             <div class="inner test" id="test-1">
                 <div class="label-wrapper">
                     <label>Test 1. &beta; =  </label>
@@ -59,34 +63,34 @@
                 <div class="label-wrapper">
                     <label>Test 2. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.2" />
+                <input class="spinner-beta" name="value" value="0.1" />
             </div>
 
             <div class="inner test" id="test-3" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 3. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.4" />
+                <input class="spinner-beta" name="value" value="0.2" />
             </div>
 
             <div class="inner test" id="test-4" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 4. &beta; =  </label>
                 </div>
-                <input class="spinner-beta"name="value" value="0.6" />
+                <input class="spinner-beta"name="value" value="0.3" />
             </div>
 
             <div class="inner test" id="test-5" style="display: none;">
                 <div class="label-wrapper">
                     <label>Test 5. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="0.8" />
+                <input class="spinner-beta" name="value" value="0.4" />
             </div>
             <div class="inner test" id="test-6">
                 <div class="label-wrapper">
                     <label>Test 6. &beta; =  </label>
                 </div>
-                <input class="spinner-beta" name="value" value="1.0" />
+                <input class="spinner-beta" name="value" value="0.5" />
             </div>
             <div class="inner test" id="test-7">
                 <div class="label-wrapper">
@@ -118,6 +122,7 @@
                 </div>
                 <input class="spinner-beta" name="value" value="1.0" />
             </div>
+-->
 
             <div class="delimiter"></div>
 
@@ -135,6 +140,22 @@
                     <label title="Test against content-based RS">Test CB </label>
                 </div>
                 <input type="checkbox" id="ckb-cb-alg" checked="checked" />
+            </div>
+            
+            <!-- Alternative T+U algorithm selection (TU_2, ALT & ALT_2)--> 
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against alternative normalization methods for T+U">Test alternative T+U </label>
+                </div>
+                <input type="checkbox" id="ckb-alt-alg" checked="checked" />
+            </div>
+            
+            <!--  TU + CB   --> 
+            <div class="inner">
+                <div class="label-wrapper">
+                    <label title="Test against T+U augmentedwith CB">Test alternative T+U+CB </label>
+                </div>
+                <input type="checkbox" id="ckb-tucb-alg" checked="checked" />
             </div>
 
             <div class="delimiter"></div>
@@ -166,13 +187,11 @@
                     <label title="Runs per recommendation size selected">Runs: </label>
                 </div>
                 <select class="select" id="select-iterations">
-                    <option value="1" selected>1</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                    <option value="10" selected>10</option>
                 </select>
             </div>
 
@@ -218,7 +237,6 @@
                 <a id="download-bookmarks" href="#">&darr;Bookmarks</a>
                 <a id="download-recs" href="#">&darr;Recommendations</a>
                 <a id="download-documents" href="#">&darr;Documents</a>
-                <a id="download-documents-dict" href="#">&darr;Documents Dict</a>
                 <a id="download-results-csv" class="download-link" for="#results" ext="csv" href="#">&darr;csv</a>
                 <a id="download-results-json" class="download-link" for="#results" ext="json" href="#">&darr;json</a>
             </div>
@@ -239,6 +257,10 @@
         <!-- App scripts -->
         <script type="text/javascript" src="libs/multiple-select-master/jquery.multiple.select.js" charset="utf-8"></script>
         <script type="text/javascript" src="../app/js/dataset-manager.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../datasets/dataset_AR.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../datasets/dataset_CE.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../datasets/dataset_WW.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../datasets/dataset_Ro.js" charset="utf-8"></script>
         <script type="text/javascript" src="../app/js/evaluation-results.js" charset="utf-8"></script>
         <script type="text/javascript" src="../app/js/file-generator.js" charset="utf-8"></script>
         <script type="text/javascript" src="libs/natural-custom.js" charset="utf-8"></script>
@@ -250,10 +272,13 @@
         <script type="text/javascript" src="js/bookmarks.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/utils.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/keywordExtractor.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/rs-tu.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/rs-mp.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/rs-alt.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/rs-cb.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-mp.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-tu.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-tu-2.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-alt.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/rs-alt-2.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/tucb.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/rs-tester.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/main.js" charset="utf-8"></script>
     </body>

@@ -1,4 +1,4 @@
-[
+var dataset_WW = [
       {
         "id": "1f8dc016-ecab-3c02-8d10-6ee2b5603cb5",
         "title": "Valuations of compensation and benefit items by new entrants into the professional workforce : do men and women differ ?",
@@ -899,6 +899,6 @@
             "year": "2001"
         }
     }
-]
+];
 
 

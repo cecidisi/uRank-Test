@@ -7,22 +7,14 @@ window.RStester = (function(){
         _this = this;
         this.RS = {
             TU: new RS_TU(),
+            TU_2: new RS_TU_2(),
             ALT: new RS_ALT(),
+            ALT_2: new RS_ALT_2(),
             MP: new RS_MP(),
             CB: new RS_CB(),
-        }
-
-        this.count = {
-            TU: {},
-            MP: {},
-            ALT: {},
-            CB: {}
+            TUCB: new RS_TUCB()
         }
     }
-
-
-
-
 
 
 
@@ -60,12 +52,8 @@ window.RStester = (function(){
 
             return list;
         },
-        getHitCount: function(){
-            return this.count;
-        },
 
         clear: function(){
-            _this.count = { TU: {}, MP: {}, ALT: {}, CB: {} };
             Object.keys(_this.RS).forEach(function(rs){
                 _this.RS[rs].clear();
             });
@@ -78,9 +66,9 @@ window.RStester = (function(){
             }, options);
 
             var rs = this.RS[recommender] || this.RS.TU;
-
             rs.clear();
 
+            console.log(recommender);
             // Set training set
             trainingData.forEach(function(d){ rs.addBookmark(d); });
 
@@ -89,11 +77,6 @@ window.RStester = (function(){
                 rankScore = 0,
                 ndcg = 0,
                 timeLapse = $.now();
-
-//            if(recommender == 'TU') {
-//                console.log('TU stats');
-//                console.log(rs.stats());
-//            }
 
             testData.forEach(function(d){
                 var args = {
@@ -107,9 +90,6 @@ window.RStester = (function(){
 
                 kArray.forEach(function(k){
                     var rank = _.findIndex(recs.slice(0,k), function(r){ return r.doc == d.doc }) + 1;
-
-//                    if(rank)
-//                        _this.count[recommender][k] = (!_this.count[recommender][k]) ? 1: _this.count[recommender][k] + 1;
 
                     results.push({
                         rs: recommender,

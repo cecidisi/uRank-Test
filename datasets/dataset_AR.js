@@ -1,4 +1,4 @@
-[
+var dataset_AR = [
     {
         "id":"7fafc327-a439-3ec8-ba4b-704c776f25d7",
         "title":"Augmented reality: an application of heads-up display technology to manual manufacturing processes",
@@ -779,5 +779,5 @@
             "year":"2013"
         }
     }
-]
+];
 

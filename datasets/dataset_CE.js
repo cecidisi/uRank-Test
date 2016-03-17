@@ -1,4 +1,4 @@
-[
+var dataset_CE = [
     {
         "id":"00dfee92-fe34-375b-91d2-0c376a2cab16",
         "title":"The circular economy in China",
@@ -959,4 +959,4 @@
             "license":"https://creativecommons.org/licenses/by/3.0/legalcode"
         }
     }
-]
+];

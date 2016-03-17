@@ -5,8 +5,10 @@
     var decPos = 3;
 
     var $selectNumberTests = $('#select-number-tests'),
-        $ckbPopAlg = $('#ckb-pop-alg'),
-        $ckbCbAlg = $('#ckb-cb-alg'),
+        $ckbMP = $('#ckb-pop-alg'),
+        $ckbCB = $('#ckb-cb-alg'),
+        $ckbAlt = $('#ckb-alt-alg'),
+        $ckbTUCB = $('#ckb-tucb-alg'),
         $selectPctgTraining = $('#select-pctg-training'),
         $selectIterations = $('#select-iterations'),
         $selectTopN = $('#select-top-n'),
@@ -22,8 +24,6 @@
         $testSections = $('.inner.test');
 
     var testSectionIdPrefix = '#test-';
-
-    var documents = [];
 
     function shuffle(original) {
         var o = original.slice();
@@ -67,38 +67,6 @@
 
         return _data;
     }
-
-
-//    function loadDocumentsAndExtractKeywords(cb) {
-//
-//        var dsm = new DatasetManager();
-//        var keywordExtractor = new KeywordExtractor();
-//        var ds = dsm.getIDsAndDescriptions();
-//        var done = 0;
-//
-//        for(var i=0; i<ds.length;++i) {
-//            dsm.getDataset(ds[i].id, function(data){
-//                documents = $.merge(documents, data);
-//                if(++done === ds.length) {
-//
-//                    documents.forEach(function(d){
-//                        d.index = i;
-//                        d.title = d.title.clean();
-//                        d.description = d.description.clean();
-//                        var doc = (d.description) ? d.title +'. '+ d.description : d.title;
-//                        keywordExtractor.addDocument(doc);
-//                    });
-//                    keywordExtractor.processCollection();
-//                    documents.forEach(function(d, i){
-//                        d.keywords = keywordExtractor.listDocumentKeywords(i)
-//                    });
-//                    downloadData('documents', 'json', JSON.stringify(documents));
-//                }
-//            });
-//        }
-//    }
-//    loadDocumentsAndExtractKeywords();
-
 
     var data = getInitData().slice();
 //    var data = window.bookmarks.slice();
@@ -255,20 +223,40 @@
             topNarray = $selectTopN.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
             iterations = $selectIterations.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100),
-            betaValues = [],    //  array of float
+            betaValues = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],    //  array of float
+//            tucbParams = [
+//                { alpha: }
+//            ],
             conditions = [];    //  array { alg:string, beta:float }
 
         //  Set conditions por TU tets and add POP test if checkbox is checked
-        for(var i=1; i<=numberTUTests; i++ ) {
-            betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
-            conditions.push({ alg: 'TU', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
-            conditions.push({ alg: 'ALT', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
-        }
+//        for(var i=1; i<=numberTUTests; i++ ) {
+//            betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
+//            conditions.push({ alg: 'ALT_2', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });    
+//            if($ckbAlt.is(':checked')) {
+//                conditions.push({ alg: 'TU', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
+//                conditions.push({ alg: 'TU_2', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
+//                conditions.push({ alg: 'ALT', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
+//            }
+//        }
+        
+        betaValues.forEach(function(beta){
+//            conditions.push({ alg: 'TU', beta: beta });
+            conditions.push({ alg: 'ALT_2', beta: beta });    
+            if($ckbAlt.is(':checked')) {
+                conditions.push({ alg: 'TU', beta: beta });
+                conditions.push({ alg: 'TU_2', beta: beta });
+                conditions.push({ alg: 'ALT', beta: beta });
+//                conditions.push({ alg: 'ALT_2', beta: beta });    
+            }
+        })
 
-        if($ckbPopAlg.is(':checked'))
+        if($ckbMP.is(':checked'))
             conditions.push({ alg: 'MP', beta: -1 });
-        if($ckbCbAlg.is(':checked'))
-            conditions.push({ alg: 'CB', beta: -1 })
+        if($ckbCB.is(':checked'))
+            conditions.push({ alg: 'CB', beta: -1 });
+            
+        conditions.push({ alg: 'TUCB', beta: -1 });
 
         //var totalToProcess = conditions.length * topNarray.length * iterations,
         var totalToProcess = conditions.length * iterations,
@@ -282,7 +270,7 @@
                 beta = conditions[condIndex].beta,
                 trainingData = data.training,
                 testData = data.test,
-                message = 'Runing... ' + Math.roundTo((++totalProcessed)*100/totalToProcess, 1) + '% processed';
+                message = 'Runing... ' + Math.roundTo((++totalProcessed)*100/totalToProcess, 1) + '% done';
 
             $statusMsg.text(message);
 
@@ -329,8 +317,7 @@
 
 
         process(getTrainingAndTestData(pctg), 1, 0);
-    };
-
+    };    
 
 
     var selectNumberTestsChanged = function() {
@@ -376,12 +363,39 @@
     $selectPctgTraining.on('change', pctgTrainingSelectChanged).trigger('change');
 
     $('#download-bookmarks').click(function(){ downloadData('bookmarks', 'json', JSON.stringify(data)) });
-    $('#download-recs').click(function(){ downloadData('recs', 'json', JSON.stringify(rsTester.getTop5Lists(data))) })
+    $('#download-recs').click(function(){ downloadData('recs', 'json', JSON.stringify(rsTester.getTop5Lists(data))) });
+    $('#download-documents').click(function(evt){ evt.stopPropagation(); downloadData('documents', 'json', JSON.stringify(getDocumentsWithKeywords())); });
     $downloadResultsJson.click(function(){ saveData(JSON.stringify(results), 'json') });
     $downloadResultsCsv.click(function(){ saveData(getCsv(results), 'csv') });
-    $('#download-documents-dict').click(function(){
-        var dict = {};
-        window.documents.forEach(function(d){ dict[d.id] = d });
-        downloadData('Documents_dict', 'json', JSON.stringify(dict));
-    })
+    
+    
+    ///////////////////////////////////////////////////////////////////////
+
+    var getDocumentsWithKeywords = function() {
+        var keywordExtractor = new KeywordExtractor();
+        var arr = $.merge([], dataset_AR);
+        arr = $.merge(arr, dataset_CE);
+        arr = $.merge(arr, dataset_WW);
+        arr = $.merge(arr, dataset_Ro);
+        
+        arr.forEach(function(d,i){
+            d.index = i;
+            d.title = d.title.clean();
+            d.description = d.description.clean();
+            var doc = (d.description) ? d.title +'. '+ d.description : d.title;
+            keywordExtractor.addDocument(doc);
+        });
+
+        keywordExtractor.processCollection();
+
+        var documents = {};
+        arr.forEach(function(d, i){
+            d.keywords = keywordExtractor.listDocumentKeywords(i);
+            documents[d.id] = d            
+        });
+        return documents;
+    };
+    
+
+    ///////////////////////////////////////////////////////////////////////
 })();
