@@ -37,8 +37,8 @@ window.RS_CB = (function(){
                     var score = 0;
                     p.keywords.forEach(function(q) {
                         // termScore = tf-idf(d, t) * unitQueryVector(t) * weight(query term) / |d|   ---    |d| = euclidenNormalization(d)
-                        if(d.keywords[q.term])
-                            score += ((parseFloat(d.keywords[q.term]) / docNorm) * unitQueryVectorDot * parseFloat(q.weight));
+                        if(d.keywords[q.stem])
+                            score += ((parseFloat(d.keywords[q.stem]) / docNorm) * unitQueryVectorDot * parseFloat(q.weight));
                     });
                     recs.push({ doc: d.id, score: score });
                 });

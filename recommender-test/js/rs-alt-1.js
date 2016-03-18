@@ -1,22 +1,57 @@
 /******************************************************************************************
 *
 *   softmax normaliaztion on tag and user scores, softmax normalization on final score
+*   computes pseude tag and user scores based on 5 most similar documents when actual score doesnt exist
 *
 *******************************************************************************************/
 
-window.RS_TU = (function(){
+window.RS_ALT_1 = (function(){
 
     var _this;
     //  cosntructor
-    function RS_TU() {
+    function RS_ALT_1() {
         _this = this;
         this.userItemMatrix = {};       //  boolean values
         this.itemTagMatrix = {};        //  counts repetitions
         this.userTagMatrix = {};        //  counts repetitions
+        this.docSimilarityMatrix = {};
+        this.data = window.documents;
+        this.docIDs = Object.keys(this.data);
+
+       for(var i=0; i<_this.docIDs.length-1; ++i){
+           for(var j=i+1; j<_this.docIDs.length; ++j) {
+               var id1 = _this.docIDs[i], id2 = _this.docIDs[j],
+                   d1 = _this.data[id1], d2 = _this.data[id2],
+                   d1Norm = getEuclidenNorm(d1.keywords), d2Norm = getEuclidenNorm(d2.keywords),
+                   unionTerms = _.union(Object.keys(d1.keywords), Object.keys(d2.keywords)),
+                   docSimilarity = 0;
+
+               unionTerms.forEach(function(term) {
+                   var tfidf1 = d1.keywords[term] || 0.0,
+                       tfidf2 = d2.keywords[term] || 0.0
+                   docSimilarity += parseFloat((tfidf1 * tfidf2) / (d1Norm * d2Norm ));
+               });
+                docSimilarity = parseFloat(docSimilarity/unionTerms.length)
+               if(docSimilarity) {
+                   if(!_this.docSimilarityMatrix[id1]) _this.docSimilarityMatrix[id1] = [];
+                   if(!_this.docSimilarityMatrix[id2]) _this.docSimilarityMatrix[id2] = [];
+                   _this.docSimilarityMatrix[id1].push({ id: id2, similarity: docSimilarity })
+                   _this.docSimilarityMatrix[id2].push({ id: id1, similarity: docSimilarity })
+               }
+           }
+       }
+
+        _this.docIDs.forEach(function(doc){
+            _this.docSimilarityMatrix[doc] = _this.docSimilarityMatrix[doc].sort(function(d1, d2){
+                if(d1.similarity > d2.similarity) return -1;
+                if(d1.similarity < d2.similarity) return 1;
+                return 0;
+            })
+       });
     }
 
 
-    RS_TU.prototype = {
+    RS_ALT_1.prototype = {
 
         addBookmark: function(args) {
             var p = $.extend({ user: undefined, doc: undefined, keywords: undefined }, args);
@@ -54,7 +89,6 @@ window.RS_TU = (function(){
                 options: {
                     beta: 0.5,
                     neighborhoodSize: 20,
-                    simDocuments: 5,
                     and: false,
                     k: 0
                 }
@@ -72,7 +106,7 @@ window.RS_TU = (function(){
                         return  parseFloat(Math.pow(Math.E, _this.userTagMatrix[user][tag]));
                     }).reduce(function(val1, val2){ return (val1 + val2) });
 
-                    p.keywords.forEach(function(k){
+                    p.keywords.forEach(function(k) {
                         if(_this.userTagMatrix[user][k.stem]) {
                             var normalizedFreq = parseFloat(Math.pow(Math.E, _this.userTagMatrix[user][k.stem]) / userTagsExpSum);
                             userSim += parseFloat((normalizedFreq * k.weight * growthFun(_this.userTagMatrix[user][k.stem])) / p.keywords.length);
@@ -104,16 +138,18 @@ window.RS_TU = (function(){
 
                     //  Compute tag-based score
                     p.keywords.forEach(function(k) {
-                        // Check if current document has been tagged with current tag
-                        if(_this.itemTagMatrix[doc][k.stem]) {
-                            var normalizedFreq = Math.pow(Math.E, _this.itemTagMatrix[doc][k.stem]) / itemTagsExpSum;           // normalized item-tag frequency
-                            var singleTagScore = (normalizedFreq * k.weight * growthFun(_this.itemTagMatrix[doc][k.stem]) / p.keywords.length);
+                        // Check if current document has been tagged with current tag, use tfidf or 0 otherwise
+                        var kScore = _this.itemTagMatrix[doc][k.stem] ? _this.itemTagMatrix[doc][k.stem] : (_this.data[doc].keywords[k.stem] ? _this.data[doc].keywords[k.stem] : 0.0),
+                            scalingFactor = _this.itemTagMatrix[doc][k.stem] ? growthFun(kScore) : 0.5;
+
+                        if (kScore) {
+                            var normalizedFreq = Math.pow(Math.E, kScore) / itemTagsExpSum;           // normalized item-tag frequency
+                            var singleTagScore = parseFloat((normalizedFreq * k.weight * scalingFactor) / p.keywords.length);
                             tags[k.stem] = { tagged: _this.itemTagMatrix[doc][k.stem], score: singleTagScore, term: k.term };
                             tagScore += singleTagScore;
                         }
                     });
                     expSumTags += Math.pow(Math.E, tagScore);
-
 
                     //  Compute user-based score => neighbor similarity * 1 | 0
                     neighbors.forEach(function(v) {
@@ -122,6 +158,15 @@ window.RS_TU = (function(){
                         if(_this.userItemMatrix[v.user][doc]) {
                             singleUserScore += v.score;
                             users++;
+                        }
+                        // check if neighbour has bookmarked similar documents
+                        else {
+                            for(var i=0; i<p.options.simDocuments; ++i) {
+                                var simDoc = _this.docSimilarityMatrix[doc][i];
+                                if(_this.userItemMatrix[v.user][simDoc.id]) {
+                                    singleUserScore += parseFloat((v.score * simDoc.similarity) / p.options.simDocuments);
+                                }
+                            }
                         }
                         userScore += parseFloat(singleUserScore / neighbors.length);
                     });
@@ -179,5 +224,5 @@ window.RS_TU = (function(){
 
     };
 
-    return RS_TU;
+    return RS_ALT_1;
 })();

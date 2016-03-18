@@ -7,12 +7,10 @@ window.RStester = (function(){
         _this = this;
         this.RS = {
             TU: new RS_TU(),
-            TU_2: new RS_TU_2(),
-            ALT: new RS_ALT(),
+            ALT_1: new RS_ALT_1(),
             ALT_2: new RS_ALT_2(),
             MP: new RS_MP(),
-            CB: new RS_CB(),
-            TUCB: new RS_TUCB()
+            CB: new RS_CB()
         }
     }
 

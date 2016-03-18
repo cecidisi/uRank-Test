@@ -22,8 +22,9 @@
         $downloadLinks = $('.download-link'),
         tbody = 'tbody',
         $testSections = $('.inner.test');
-
     var testSectionIdPrefix = '#test-';
+    var stemmer = natural.PorterStemmer; //natural.LancasterStemmer;
+        stemmer.attach();
 
     function shuffle(original) {
         var o = original.slice();
@@ -35,14 +36,14 @@
     function getInitData() {
         var _data = [];
         var kw_aux = [
-            { query: 'women in workforce', keywords: ['participation&woman&workforce', 'gap&gender&wage', 'inequality&man&salary&wage&woman&workforce']},       // 9
-            { query: 'robot', keywords: ['autonomous&robot', 'human&interaction&robot', 'control&information&robot&sensor']},                                   // 7
-            { query: 'augmented reality', keywords: ['environment&virtual', 'context&object&recognition', 'augmented&environment&image&reality&video&world']},  // 10
-            { query: 'circular economy', keywords: ['management&waste', 'china&industrial&symbiosis', 'circular&economy&fossil&fuel&system&waste']}];           // 10
+            { query: 'women in workforce', keywords: ['participation,woman,workforce', 'gap,gender,wage', 'inequality,man,salary,wage,woman,workforce']},       // 9
+            { query: 'robot', keywords: ['autonomous,robot', 'human,interaction,robot', 'control,information,robot,sensor']},                                   // 7
+            { query: 'augmented reality', keywords: ['environment,virtual', 'context,object,recognition', 'augmented,environment,image,reality,video,world']},  // 10
+            { query: 'circular economy', keywords: ['management,waste', 'china,industrial,symbiosis', 'circular,economy,fossil,fuel,system,waste']}];           // 10
 
         function getKeywords(query, questionNumber) {
             var index = _.findIndex(kw_aux, function(kw){ return kw.query == query });
-            return kw_aux[index].keywords[questionNumber - 1].split('&');
+            return kw_aux[index].keywords[questionNumber - 1].split(',');
         }
 
         function randomFromTo(from, to){
@@ -56,7 +57,7 @@
                     var user = (r.user - 1) * 3 + q['question-number'];
 
                     q['selected-items'].forEach(function(d){
-                        var usedKeywords =  keywords.slice();//shuffle(keywords).slice();
+                        var usedKeywords =  keywords.slice().map(function(k){ return { term: k, stem: k.stem(), weight: 1 } });//shuffle(keywords).slice();
 //                        if(q["question-number"]>2)
 //                            usedKeywords = usedKeywords.slice(0, randomFromTo(3,keywords.length));
                         _data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic, task: (q['question-number'] < 3) ? 'focus' : 'broad', question: q["question-number"] });
@@ -81,9 +82,6 @@
         var shuffledData = shuffle(data.slice());
         var trainingData = shuffledData.slice(0, cutIndex);
         var testData = shuffledData.slice(cutIndex, shuffledData.length);
-        testData.forEach(function(d){
-            d.keywords = d.keywords.map(function(k){ return { term: k, weight: 1 }; });
-        });
         return { training: trainingData, test: testData };
     }
 
@@ -225,26 +223,12 @@
             pctg = parseFloat($selectPctgTraining.val() / 100),
             betaValues = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],    //  array of float
             conditions = [];    //  array { alg:string, beta:float }
-
-        //  Set conditions por TU tets and add POP test if checkbox is checked
-//        for(var i=1; i<=numberTUTests; i++ ) {
-//            betaValues.push(parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()));
-//            conditions.push({ alg: 'ALT_2', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });    
-//            if($ckbAlt.is(':checked')) {
-//                conditions.push({ alg: 'TU', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
-//                conditions.push({ alg: 'TU_2', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
-//                conditions.push({ alg: 'ALT', beta: parseFloat($(testSectionIdPrefix+''+i).find('.spinner-beta').val()) });
-//            }
-//        }
         
         betaValues.forEach(function(beta){
-//            conditions.push({ alg: 'TU', beta: beta });
-            conditions.push({ alg: 'ALT_2', beta: beta });    
+            conditions.push({ alg: 'TU', beta: beta });
             if($ckbAlt.is(':checked')) {
-//               conditions.push({ alg: 'TU', beta: beta });
-//                conditions.push({ alg: 'TU_2', beta: beta });
-                conditions.push({ alg: 'ALT', beta: beta });
-//                conditions.push({ alg: 'ALT_2', beta: beta });    
+                conditions.push({ alg: 'ALT_1', beta: beta });
+                conditions.push({ alg: 'ALT_2', beta: beta });
             }
         })
 

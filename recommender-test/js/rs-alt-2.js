@@ -1,13 +1,9 @@
-/*******************************************************************************
+/******************************************************************************************
 *
 *   softmax normaliaztion on tag and user scores, softmax normalization on final score
+*   computes pseude tag and user scores based on 5 most similar documents when actual score doesnt exist
 *
-********************************************************************************/
-
-if(!Math.roundTo)
-    Math.roundTo = function(value, places) {
-        return +(Math.round(value + "e+" + places)  + "e-" + places);
-    }
+*******************************************************************************************/
 
 window.RS_ALT_2 = (function(){
 
@@ -18,10 +14,6 @@ window.RS_ALT_2 = (function(){
         this.userItemMatrix = {};       //  boolean values
         this.itemTagMatrix = {};        //  counts repetitions
         this.userTagMatrix = {};        //  counts repetitions
-        this.maxTagAcrossDocs = {};     //  highest frequency of each tag in a document. Depends on item-tag matrix
-        this.maxTagAccrossUsers = {};   //  highest frequency of each tag for a user. Depends on user-tag matrix
-        this.sumTagAcrossDocs = {};
-        this.sumTagAcrossUsers = {};
         this.docSimilarityMatrix = {};
         this.data = window.documents;
         this.docIDs = Object.keys(this.data);
@@ -83,23 +75,8 @@ window.RS_ALT_2 = (function(){
 
             // update item-tag, user-tag and tagMax matrices
             p.keywords.forEach(function(k){
-                _this.itemTagMatrix[p.doc][k] = (_this.itemTagMatrix[p.doc][k]) ? _this.itemTagMatrix[p.doc][k] + 1 : 1;
-                _this.userTagMatrix[p.user][k] = (_this.userTagMatrix[p.user][k]) ? _this.userTagMatrix[p.user][k] + 1 : 1;
-
-                if(!_this.maxTagAcrossDocs[k] || _this.itemTagMatrix[p.doc][k] > _this.maxTagAcrossDocs[k])
-                    _this.maxTagAcrossDocs[k] = _this.itemTagMatrix[p.doc][k];
-
-                if(!_this.maxTagAccrossUsers[k] || _this.userTagMatrix[p.user][k] > _this.maxTagAccrossUsers[k])
-                    _this.maxTagAccrossUsers[k] = _this.userTagMatrix[p.user][k];
-
-                // Sum values
-                if(!_this.sumTagAcrossDocs[k])
-                    _this.sumTagAcrossDocs[k] = 0;
-                _this.sumTagAcrossDocs[k] += _this.itemTagMatrix[p.doc][k];
-
-                if(!_this.sumTagAcrossUsers[k])
-                    _this.sumTagAcrossUsers[k] = 0;
-                _this.sumTagAcrossUsers[k] += _this.userTagMatrix[p.user][k];
+                _this.itemTagMatrix[p.doc][k.stem] = (_this.itemTagMatrix[p.doc][k.stem]) ? _this.itemTagMatrix[p.doc][k.stem] + 1 : 1;
+                _this.userTagMatrix[p.user][k.stem] = (_this.userTagMatrix[p.user][k.stem]) ? _this.userTagMatrix[p.user][k.stem] + 1 : 1;
             });
             return 'success';
         },
@@ -131,9 +108,9 @@ window.RS_ALT_2 = (function(){
                     }).reduce(function(val1, val2){ return (val1 + val2) });
 
                     p.keywords.forEach(function(k){
-                        if(_this.userTagMatrix[user][k.term]) {
-                            var normalizedFreq = parseFloat(Math.pow(Math.E, _this.userTagMatrix[user][k.term]) / userTagsExpSum);
-                            userSim += parseFloat((normalizedFreq * k.weight * growthFun(_this.userTagMatrix[user][k.term])) / p.keywords.length);
+                        if(_this.userTagMatrix[user][k.stem]) {
+                            var normalizedFreq = parseFloat(Math.pow(Math.E, _this.userTagMatrix[user][k.stem]) / userTagsExpSum);
+                            userSim += parseFloat((normalizedFreq * k.weight * growthFun(_this.userTagMatrix[user][k.stem])) / p.keywords.length);
                         }
                     });
                     if(userSim)
@@ -163,10 +140,10 @@ window.RS_ALT_2 = (function(){
                     //  Compute tag-based score
                     p.keywords.forEach(function(k) {
                         // Check if current document has been tagged with current tag
-                        if(_this.itemTagMatrix[doc][k.term]) {
-                            var normalizedFreq = Math.pow(Math.E, _this.itemTagMatrix[doc][k.term]) / itemTagsExpSum;           // normalized item-tag frequency
-                            var singleTagScore = (normalizedFreq * k.weight * growthFun(_this.itemTagMatrix[doc][k.term]) / p.keywords.length);
-                            tags[k.term] = { tagged: _this.itemTagMatrix[doc][k.term], score: singleTagScore };
+                        if(_this.itemTagMatrix[doc][k.stem]) {
+                            var normalizedFreq = Math.pow(Math.E, _this.itemTagMatrix[doc][k.stem]) / itemTagsExpSum;           // normalized item-tag frequency
+                            var singleTagScore = (normalizedFreq * k.weight * growthFun(_this.itemTagMatrix[doc][k.stem]) / p.keywords.length);
+                            tags[k.stem] = { tagged: _this.itemTagMatrix[doc][k.stem], score: singleTagScore, term: k.term };
                             tagScore += singleTagScore;
                         }
                         //  Check if similar documents have been tagged with current tag
@@ -174,8 +151,8 @@ window.RS_ALT_2 = (function(){
                             var singleTagScore = 0.0;
                             for(var i=0; i<p.options.simDocuments; ++i) {
                                 var simDoc = _this.docSimilarityMatrix[doc][i];
-                                if(_this.itemTagMatrix[simDoc.id] && _this.itemTagMatrix[simDoc.id][k.term]) {
-                                    var freq = parseFloat(_this.itemTagMatrix[simDoc.id][k.term] * simDoc.similarity);
+                                if(_this.itemTagMatrix[simDoc.id] && _this.itemTagMatrix[simDoc.id][k.stem]) {
+                                    var freq = parseFloat(_this.itemTagMatrix[simDoc.id][k.stem] * simDoc.similarity);
                                     var normalizedFreq = Math.pow(Math.E, (freq)) / itemTagsExpSum;           // normalized item-tag frequency
                                     singleTagScore = parseFloat(normalizedFreq * k.weight * growthFun(freq) / p.keywords.length);
                                     tagScore += singleTagScore;
@@ -243,8 +220,6 @@ window.RS_ALT_2 = (function(){
             this.userItemMatrix = {};
             this.itemTagMatrix = {};
             this.userTagMatrix = {};
-            this.maxTagAcrossDocs = {};
-            this.maxTagAccrossUsers = {};
         },
 
         //  Miscelaneous
