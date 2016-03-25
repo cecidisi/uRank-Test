@@ -57,9 +57,9 @@
                     var user = (r.user - 1) * 3 + q['question-number'];
 
                     q['selected-items'].forEach(function(d){
-                        var usedKeywords =  keywords.slice().map(function(k){ return { term: k, stem: k.stem(), weight: 1 } });//shuffle(keywords).slice();
-//                        if(q["question-number"]>2)
-//                            usedKeywords = usedKeywords.slice(0, randomFromTo(3,keywords.length));
+                        var usedKeywords = shuffle(keywords.slice().map(function(k){ return { term: k, stem: k.stem(), weight: 1 } }));
+                        if(q["question-number"]>2)
+                            usedKeywords = usedKeywords.slice(0, randomFromTo(3,keywords.length));
                         _data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic, task: (q['question-number'] < 3) ? 'focus' : 'broad', question: q["question-number"] });
                     });
                 });
@@ -222,13 +222,16 @@
             iterations = $selectIterations.val(),
             pctg = parseFloat($selectPctgTraining.val() / 100),
             betaValues = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],    //  array of float
+            //betaValues = [0.8],    //  array of float
             conditions = [];    //  array { alg:string, beta:float }
         
         betaValues.forEach(function(beta){
-            conditions.push({ alg: 'TU', beta: beta });
+//            conditions.push({ alg: 'TU', beta: beta });
+            conditions.push({ alg: 'ALT_2', beta: beta });
             if($ckbAlt.is(':checked')) {
+                conditions.push({ alg: 'TU', beta: beta });
                 conditions.push({ alg: 'ALT_1', beta: beta });
-                conditions.push({ alg: 'ALT_2', beta: beta });
+//                conditions.push({ alg: 'ALT_2', beta: beta });
             }
         })
 

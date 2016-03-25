@@ -53,7 +53,7 @@ window.RS_TU = (function(){
                 keywords: [],
                 options: {
                     beta: 0.5,
-                    neighborhoodSize: 20,
+                    neighborhoodSize: 10,
                     simDocuments: 5,
                     and: false,
                     k: 0
@@ -154,6 +154,7 @@ window.RS_TU = (function(){
             });
 
             var size = p.options.k ? p.options.k : recs.length;
+            //console.log(recs.slice(0, 10));
             return recs.slice(0, size);
         },
 

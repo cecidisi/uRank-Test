@@ -77,7 +77,10 @@ window.RStester = (function(){
                 ndcg = 0,
                 timeLapse = $.now();
 
-            testData.forEach(function(d){
+            var emptyRecs = 0;
+
+
+            testData.forEach(function(d, i){
                 var args = {
                     user: d.user,
                     keywords: d.keywords,
@@ -85,7 +88,19 @@ window.RStester = (function(){
                     topic: d.topic
                 };
 
-                var recs = rs.getRecommendations(args);
+                var show = false;
+                if(i<3) {
+                   // console.log('***** ' + d.doc);
+                   //show = true;
+                }
+
+                var recs = rs.getRecommendations(args, show);
+
+                if(!recs.length) emptyRecs++;
+
+                if(i<3) {
+                //    console.log(recs.slice(0,5));
+                }
 
                 kArray.forEach(function(k){
                     var rank = _.findIndex(recs.slice(0,k), function(r){ return r.doc == d.doc }) + 1;
@@ -107,7 +122,7 @@ window.RStester = (function(){
 
             });
 
-            console.log('Time lapse = ' + ($.now() - tmsp));
+            console.log('Time lapse = ' + ($.now() - tmsp) + '; Empty Recs = ' + emptyRecs);
             return results;
         }
 
