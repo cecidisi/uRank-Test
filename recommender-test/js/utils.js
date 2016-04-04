@@ -8,6 +8,66 @@ var getEuclidenNorm = function(docKeywords) {
 };
 
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Array prototype
+ *
+ * */
+
+
+Array.prototype.quickSort = function(par) {
+
+    return qs(this, 0, this.length-1);
+
+    function qs(arr, left, right) {
+        var i = left;
+        var j = right;
+        var tmp;
+        pivotidx = parseInt((left + right) / 2);
+        var pivot = arr[pivotidx];
+        /* partition */
+        while (i <= j) {
+            while (arr[i][par] < pivot[par])
+                i++;
+            while (arr[j][par] > pivot[par])
+                j--;
+            if (i <= j) {
+                tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+                i++;
+                j--;
+            }
+        }
+        /* recursion */
+        if (left < j)
+            qs(arr, left, j);
+        if (i < right)
+            qs(arr, i, right);
+        return arr;
+    }
+}
+
+
+Array.prototype.bubbleSort = function(par){
+    var a = this, swapped;
+    do {
+        swapped = false;
+        for (var i=0, len=a.length; i<len-1; i++) {
+            if (a[i][par] > a[i + 1][par]) {
+                var temp = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = temp;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    return a;
+};
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * String prototype

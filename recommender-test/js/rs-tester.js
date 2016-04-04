@@ -7,47 +7,56 @@ window.RStester = (function(){
         _this = this;
         this.RS = {
             TU: new RS_TU(),
-            ALT_1: new RS_ALT_1(),
-            ALT_2: new RS_ALT_2(),
+            TU_ALT: new RS_TU_ALT(),
+            TU_OLD: new RS_TU_OLD(),
             MP: new RS_MP(),
             CB: new RS_CB()
         }
     }
 
 
-
     RStester.prototype = {
 
-        getTop5Lists: function(data) {
-
+        getTopKLists: function(data, k, betas) {
+            k = k || 5;
+            betas = betas || [0.0, 0.5, 1.0];
             var list = {};
             data.forEach(function(d){
-
                 // Add all bookmarks for training
-                _this.RS.TU.addBookmark(d);
+                _this.RS.TU_ALT.addBookmark(d);
                 _this.RS.MP.addBookmark(d);
                 _this.RS.CB.addBookmark(d);
 
-                // Set list skeleton by topic and question
+                // Scaffold list by topic and question
                 if(!list[d.topic])
                     list[d.topic] = {};
                 if(!list[d.topic][d.question])
                     list[d.topic][d.question] = { task: d.task, keywords: d.keywords };
             });
 
-            // Get recommendation lists @5 by topic and question
+            // Get recommendation lists @k by topic and question
             Object.keys(list).forEach(function(topic){
                 Object.keys(list[topic]).forEach(function(question){
+                    //var keywords = list[topic][question].keywords.map(function(kw){ return { term: kw, weight: 1 } }),
+                    var keywords = list[topic][question].keywords,
+                        lists = {};
+                    betas.forEach(function(beta){
+                        var TUalg = (parseFloat(beta) == 0.0) ? 'U' : (parseFloat(beta) == 1.0 ? 'T' : 'TU');
+                        lists[TUalg] = _this.RS.TU_ALT.getRecommendations({ keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
+                    });
+                    lists['MP'] = _this.RS.MP.getRecommendations({ topic: topic, options: { k: k }});
+                    lists['CB'] = _this.RS.CB.getRecommendations({ keywords: keywords, options: { k: k } });
 
-                    var keywords = list[topic][question].keywords.map(function(k){ return { term: k, weight: 1 } });
-                    list[topic][question].recs = {
-                        TU: _this.RS.TU.getRecommendations({ keywords: keywords, options: { beta: 0.6, neighborhoodSize: 20, k: 5 } }),
-                        MP: _this.RS.MP.getRecommendations({ topic: topic, options: { k: 5 }}),
-                        CB: _this.RS.CB.getRecommendations({ keywords: keywords, options: { k: 5 } })
-                    }
+                    Object.keys(lists).forEach(function(rs){
+                        lists[rs].forEach(function(d){
+                            d.title = window.documents[d.doc].title;
+                        })
+                    });
+
+                    list[topic][question].recs = lists;
                 });
             });
-
+            //console.log(JSON.stringify(list));
             return list;
         },
 
@@ -87,20 +96,8 @@ window.RStester = (function(){
                     options: o,
                     topic: d.topic
                 };
-
-                var show = false;
-                if(i<3) {
-                   // console.log('***** ' + d.doc);
-                   //show = true;
-                }
-
                 var recs = rs.getRecommendations(args, show);
-
                 if(!recs.length) emptyRecs++;
-
-                if(i<3) {
-                //    console.log(recs.slice(0,5));
-                }
 
                 kArray.forEach(function(k){
                     var rank = _.findIndex(recs.slice(0,k), function(r){ return r.doc == d.doc }) + 1;

@@ -9,6 +9,7 @@ window.RS_MP = (function(){
     function RS_MP() {
         _this = this;
         this.topicItemMatrix = {};
+        this.topicTot = {};
     }
 
 
@@ -23,7 +24,8 @@ window.RS_MP = (function(){
             if(!this.topicItemMatrix[p.topic])
                 this.topicItemMatrix[p.topic] = {};
 
-            this.topicItemMatrix[p.topic][p.doc] = this.topicItemMatrix[p.topic][p.doc] ? this.topicItemMatrix[p.topic][p.doc] + 1 : 1;
+            _this.topicItemMatrix[p.topic][p.doc] = _this.topicItemMatrix[p.topic][p.doc] ? _this.topicItemMatrix[p.topic][p.doc] + 1 : 1;
+            _this.topicTot[p.topic] = _this.topicTot[p.topic] ? _this.topicTot[p.topic] + 1 : 1;
         },
 
         getRecommendations: function(args) {
@@ -34,17 +36,18 @@ window.RS_MP = (function(){
 
             var recs = [];
             _.keys(this.topicItemMatrix[p.topic]).forEach(function(doc){
-                recs.push({ doc: doc, score: _this.topicItemMatrix[p.topic][doc] });
-            });
-
-            recs = recs.sort(function(r1, r2){
-                if(r1.score > r2.score) return -1;
-                if(r1.score < r2.score) return 1;
-                return 0;
+                var score = parseFloat(_this.topicItemMatrix[p.topic][doc] / _this.topicTot[p.topic]),
+                    times = _this.topicItemMatrix[p.topic][doc];
+                recs.push({ doc: doc, score: score, misc: { times: times } });
             });
 
             var size = p.options.k == 0 ? recs.length : p.options.k;
-            return recs.slice(0, size);
+            //            return recs.quickSort('score').slice(0,size);
+            return recs.sort(function(r1, r2){
+                if(r1.score > r2.score) return -1;
+                if(r1.score < r2.score) return 1;
+                return 0;
+            }).slice(0,size);
         },
 
         clear: function() {
