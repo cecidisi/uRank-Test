@@ -2,7 +2,7 @@
 window.RStester = (function(){
 
     var _this;
-    //  cosntructor
+    //  constructor
     function RStester() {
         _this = this;
         this.RS = {
@@ -21,9 +21,10 @@ window.RStester = (function(){
             k = k || 5;
             betas = betas || [0.0, 0.5, 1.0];
             var list = {};
+            var TUrs = 'TU';
             data.forEach(function(d){
                 // Add all bookmarks for training
-                _this.RS.TU_ALT.addBookmark(d);
+                _this.RS[TUrs].addBookmark(d);
                 _this.RS.MP.addBookmark(d);
                 _this.RS.CB.addBookmark(d);
 
@@ -37,12 +38,11 @@ window.RStester = (function(){
             // Get recommendation lists @k by topic and question
             Object.keys(list).forEach(function(topic){
                 Object.keys(list[topic]).forEach(function(question){
-                    //var keywords = list[topic][question].keywords.map(function(kw){ return { term: kw, weight: 1 } }),
                     var keywords = list[topic][question].keywords,
                         lists = {};
                     betas.forEach(function(beta){
                         var TUalg = (parseFloat(beta) == 0.0) ? 'U' : (parseFloat(beta) == 1.0 ? 'T' : 'TU');
-                        lists[TUalg] = _this.RS.TU_ALT.getRecommendations({ keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
+                        lists[TUalg] = _this.RS[TUrs].getRecommendations({ keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
                     });
                     lists['MP'] = _this.RS.MP.getRecommendations({ topic: topic, options: { k: k }});
                     lists['CB'] = _this.RS.CB.getRecommendations({ keywords: keywords, options: { k: k } });

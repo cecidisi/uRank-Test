@@ -10,7 +10,7 @@ $output_dir = "./tests";
 if(!file_exists($output_dir)) {
     mkdir($output_dir, 0755, true);
 }
-chmod($output_dir, 0755);
+//chmod($output_dir, 0755);
 
 if(!is_writable($output_dir)) {
     return_error('ERROR no writing permission', 1337);
