@@ -49,7 +49,7 @@ window.RS_TU = (function(){
             if(!_this.userTagMatrix[p.user]) _this.userTagMatrix[p.user] = {};
 
             // update item-tag, user-tag and tagMax matrices
-            p.keywords.forEach(function(k){
+            p.keywords.forEach(function(k) {
                 var tag = k.stem;
                 // update user-tag and item-tag matrix
                 _this.itemTagMatrix[p.doc][tag] = (_this.itemTagMatrix[p.doc][tag]) ? _this.itemTagMatrix[p.doc][tag] + 1 : 1;

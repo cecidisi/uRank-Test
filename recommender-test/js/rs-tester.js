@@ -96,7 +96,7 @@ window.RStester = (function(){
                     options: o,
                     topic: d.topic
                 };
-                var recs = rs.getRecommendations(args, show);
+                var recs = rs.getRecommendations(args);
                 if(!recs.length) emptyRecs++;
 
                 kArray.forEach(function(k){

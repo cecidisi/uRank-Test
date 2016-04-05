@@ -88,7 +88,9 @@ window.RS_TU_ALT = (function(){
             }, args);
 
             var totTagWeights = 0.0;
-            for(var i=0; i<p.keywords.length; ++i ) {
+            for(var i=0, len=p.keywords.length; i<len; ++i ) {
+                if(!p.keywords[i].weight)
+                    console.log(p.keywords);
                 totTagWeights += p.keywords[i].weight;
             }
 
@@ -130,12 +132,14 @@ window.RS_TU_ALT = (function(){
                 var commonTerms = _.intersection(Object.keys(user.tags), Object.keys(d.keywords)),
                    sim = 0.0;
                 dNorm = dNorm || getEuclidenNorm(d.keywords);
-                commonTerms.forEach(function(term) {
-                    var tfU = user.tags[term] || 0.0,
-                        tfidf = d.keywords[term] || 0.0;
-                    sim += parseFloat((tfU * tfidf) / (user.uNorm * dNorm ));
-                });
-                return parseFloat(sim / commonTerms.length);
+                for(var c=0, len=commonTerms.length; c<len; ++c) {
+                    var term = commonTerms[c],
+                        tfU = user.tags[term] || 0.0,
+                        tfidf = d.keywords[term] || 0.0,
+                        nominator = parseFloat(user.uNorm * dNorm);
+                    sim += nominator ? parseFloat((tfU * tfidf) / nominator) : 0.0;
+                }
+                return commonTerms.length ? parseFloat(sim / commonTerms.length) : 0.0;
             };
 
 
@@ -168,22 +172,17 @@ window.RS_TU_ALT = (function(){
                     // search in neighborhood
                     var userScore = 0.0, users = 0;
                     neighbors.forEach(function(v, i) {
-                        var simVD = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1.0 : 0.0;//(0.2 * getUserDocSimilarity(_this.userProfile[v.user], d, docNorm));
-
-                        if(doc == '14053480-ecd3-3374-9566-b78c137cb516' && p.keywords.map(function(k){ return k.term }).indexOf('china') > -1 ) {
-                            console.log('simUV = ' + simUV + '; simVD = ' + simVD + '; simUV*simVD = ' + parseFloat(v.simUV * simVD))
-                        }
-                       /*if(simVD < 1.0) {
-                            console.log('********************** V #' + i);
-                            console.log(simVD);
-                            console.log(Object.keys(_this.userProfile[v.user].tags));
-                            console.log(Object.keys(d.keywords));
-                        }
-*/
+                        var simVD = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1.0 : getUserDocSimilarity(_this.userProfile[v.user], d, docNorm);
+                        //var simVDdirect = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1.0 : 0.0,
+                        //    simVDindirect =  getUserDocSimilarity(_this.userProfile[v.user], d, docNorm),
+                        //    simVD = parseFloat(0.8 * simVDdirect + 0.2 * simVDindirect);
 
                         userScore += parseFloat(v.simUV * simVD);
+                        //users = (simVDdirect == 1) ? users + 1 : 1;
                         users = (simVD == 1) ? users + 1 : 1;
                     });
+
+                    userScore /= parseFloat(neighbors.length);
 
                     if(tagScore || userScore) {
                         recs.push({
@@ -202,11 +201,28 @@ window.RS_TU_ALT = (function(){
 
             var size = p.options.k ? p.options.k : recs.length;
 //            return recs.quickSort('score').slice(0,size);
-            return recs.sort(function(r1, r2){
+            recs =  recs.sort(function(r1, r2){
                 if(r1.score > r2.score) return -1;
                 if(r1.score < r2.score) return 1;
                 return 0;
-            }).slice(0,size);
+            });
+
+           /* console.log('********************************** BETA = ' + p.options.beta + ' KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
+            for(var i=0, len=30; i<len;++i) {
+                var d = recs[i],
+                    obj = {
+                    title: _this.data[d.doc].title,
+                    SCORE: d.score,
+                    Uscore: d.misc.userScore,
+                    Tscore: d.misc.tagScore
+                }
+                console.log(obj);
+                //console.log(_this.data[d.doc].title + ' --- SCORE = ' + d.score + ';  U-score = ' + d.misc.userScore + '; T-score = ' + d.misc.tagScore);
+            }
+            */
+            recs = recs.slice(0,size);
+
+            return recs;
         },
 
         clear: function() {

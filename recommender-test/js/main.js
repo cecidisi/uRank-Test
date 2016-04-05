@@ -226,9 +226,9 @@
             conditions = [];    //  array { alg:string, beta:float }
         
         betaValues.forEach(function(beta){
-            conditions.push({ alg: 'TU', beta: beta });
+            conditions.push({ alg: 'TU_ALT', beta: beta });
             if($ckbAlt.is(':checked')) {
-                conditions.push({ alg: 'TU_ALT', beta: beta });
+                conditions.push({ alg: 'TU', beta: beta });
                 conditions.push({ alg: 'TU_OLD', beta: beta });
             }
         })
@@ -343,7 +343,11 @@
     $selectPctgTraining.on('change', pctgTrainingSelectChanged).trigger('change');
 
     $('#download-bookmarks').click(function(){ downloadData('bookmarks', 'json', JSON.stringify(data)) });
-    $('#download-recs').click(function(){ downloadData('recs', 'json', JSON.stringify(rsTester.getTopKLists(getInitData()))) });
+    $('#download-recs').click(function(){
+        //downloadData('recs', 'json', JSON.stringify(rsTester.getTopKLists(getInitData())));
+        var recs = rsTester.getTopKLists(getInitData());
+       // console.log(JSON.stringify(recs));
+    });
     $('#download-documents').click(function(evt){ evt.stopPropagation(); downloadData('documents', 'json', JSON.stringify(getDocumentsWithKeywords())); });
     $downloadResultsJson.click(function(){ saveData(JSON.stringify(results), 'json') });
     $downloadResultsCsv.click(function(){ saveData(getCsv(results), 'csv') });
