@@ -161,7 +161,7 @@ window.RS_TU_ALT = (function(){
                             // oldsim += oldSimVT[tag];
 
                             //simVT[tag] = parseFloat(_this.userTagMatrix[v][tag] / _this.sumUserTag[tag]);
-                            simVT[tag] = parseFloat((_this.userTagMatrix[v][tag] / userTagsSum) / p.keywords.length);
+                            simVT[tag] = parseFloat(Math.pow(_this.userTagMatrix[v][tag], 2) / (_this.sumUserTag[tag] *  userTagsSum));// / p.keywords.length);
                             simUV += simVT[tag];
                         }
                     });
@@ -200,10 +200,10 @@ window.RS_TU_ALT = (function(){
                             simVDindirect =  getUserDocSimilarity(_this.userProfile[v.user], d, docNorm),
                             simVD = parseFloat(0.8 * simVDdirect + 0.2 * simVDindirect);*/
 
-                        userScore += parseFloat((v.simUV * simVD) / neighbors.length);
+                        userScore += parseFloat(v.simUV * simVD);
                         users = (simVD == 1) ? users + 1 : 1;
                     });
-
+                    userScore /= parseFloat(users);
 
                     var beta = parseFloat(p.options.beta),
                         score = 0.0;
@@ -219,9 +219,12 @@ window.RS_TU_ALT = (function(){
                         var normTfidf = (d.keywords[tag]) ? parseFloat(d.keywords[tag] / docNorm) : 0.0,
                             normQueryDot = parseFloat(1.0/Math.sqrt(p.keywords.length)),
                             cosSimTagDoc = parseFloat(normTfidf * normQueryDot),
+                            probDT = 0.0;
                             //probDT = (_this.itemTagMatrix[doc][tag]) ? parseFloat(_this.itemTagMatrix[doc][tag] / _this.sumItemTag[tag]) : 0.0,
-                            probDT = (_this.itemTagMatrix[doc][tag]) ? parseFloat(_this.itemTagMatrix[doc][tag] / itemTagsSum ) : 0.0,
-                            simTD = parseFloat(0.8 * probDT + 0.2 * cosSimTagDoc);
+                        if(_this.itemTagMatrix[doc][tag]) {
+                            probDT = parseFloat(Math.pow(_this.itemTagMatrix[doc][tag], 2) / (itemTagsSum * _this.sumItemTag[tag]) );
+                        }
+                        var simTD = parseFloat(0.8 * probDT + 0.2 * cosSimTagDoc);
                         //var singleTagScore = parseFloat(simUT[tag] * simTD);
                         //tagScore += parseFloat(singleTagScore);
                         tagScore += simTD;

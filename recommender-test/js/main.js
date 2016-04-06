@@ -347,7 +347,7 @@
     $('#download-bookmarks').click(function(){ downloadData('bookmarks', 'json', JSON.stringify(data)) });
     $('#download-recs').click(function(){
         //downloadData('recs', 'json', JSON.stringify(rsTester.getTopKLists(getInitData())));
-        var recs = rsTester.getTopKLists(getInitData());
+        var recs = rsTester.getTopKLists(getInitData(true));
        // console.log(JSON.stringify(recs));
     });
     $('#download-documents').click(function(evt){ evt.stopPropagation(); downloadData('documents', 'json', JSON.stringify(getDocumentsWithKeywords())); });
