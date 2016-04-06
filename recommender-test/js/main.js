@@ -59,7 +59,9 @@
 
                     q['selected-items'].forEach(function(d){
                         var usedKeywords = shuffle(keywords.slice().map(function(k){ return { term: k, stem: k.stem(), weight: 1 } }));
-                        if(!notRandomize && q["question-number"]>2)
+                        if(!notRandomize && q["question-number"]===2)
+                            usedKeywords = usedKeywords.slice(0, randomFromTo(2,keywords.length));
+                        else if(!notRandomize && q["question-number"]===3)
                             usedKeywords = usedKeywords.slice(0, randomFromTo(3,keywords.length));
                         _data.push({ user: user, doc: d.id, keywords: usedKeywords, topic: t.topic, task: (q['question-number'] < 3) ? 'focus' : 'broad', question: q["question-number"] });
                     });

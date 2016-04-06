@@ -21,7 +21,7 @@ window.RStester = (function(){
             k = k || 5;
             betas = betas || [0.0, 0.5, 1.0];
             var list = {};
-            var TUrs = 'TU';
+            var TUrs = 'TU_ALT';
             data.forEach(function(d){
                 // Add all bookmarks for training
                 _this.RS[TUrs].addBookmark(d);
@@ -42,7 +42,7 @@ window.RStester = (function(){
                         lists = {};
                     betas.forEach(function(beta){
                         var TUalg = (parseFloat(beta) == 0.0) ? 'U' : (parseFloat(beta) == 1.0 ? 'T' : 'TU');
-                        lists[TUalg] = _this.RS[TUrs].getRecommendations({ keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
+                        lists[TUalg] = _this.RS[TUrs].getRecommendations({ topic: topic, keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
                     });
                     lists['MP'] = _this.RS.MP.getRecommendations({ topic: topic, options: { k: k }});
                     lists['CB'] = _this.RS.CB.getRecommendations({ keywords: keywords, options: { k: k } });

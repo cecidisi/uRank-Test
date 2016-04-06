@@ -13,6 +13,8 @@ window.RS_TU_OLD = (function(){
         this.userItemMatrix = {};       //  boolean values
         this.itemTagMatrix = {};        //  counts repetitions
         this.userTagMatrix = {};        //  counts repetitions
+
+        this.data = window.documents;
     }
 
 
@@ -83,7 +85,12 @@ window.RS_TU_OLD = (function(){
                 }
             });
 
-            neighbors = neighbors.quickSort('simUV').slice(0, p.options.neighborhoodSize);
+            neighbors = neighbors.sort(function(v1, v2){
+                if(v1.simUV > v2.simUV) return -1;
+                if(v1.simUV < v2.simUV) return 1;
+                return 0;
+            }).slice(0, p.options.neighborhoodSize);
+            //neighbors = neighbors.quickSort('simUV').slice(0, p.options.neighborhoodSize);
 
             var recs = [];
             //   Keys are doc ids
@@ -97,7 +104,7 @@ window.RS_TU_OLD = (function(){
                         return Math.pow(Math.E, _this.itemTagMatrix[doc][tag])
                     }).reduce(function(val1, val2){ return (val1  +  val2) });
 
-                    //  Compute tag-based score
+                    //  T-score
                     p.keywords.forEach(function(k) {
                         // Check if current document has been tagged with current tag
                         if(_this.itemTagMatrix[doc][k.stem]) {
@@ -110,7 +117,7 @@ window.RS_TU_OLD = (function(){
                     expSumTags += Math.pow(Math.E, tagScore);
 
 
-                    //  Compute user-based score => neighbor similarity * 1 | 0
+                    //  U-score => neighbor similarity * 1 | 0
                     neighbors.forEach(function(v) {
                         var singleUserScore = 0;
                         // check if neighbour has bookmarked current document
@@ -144,11 +151,28 @@ window.RS_TU_OLD = (function(){
 
             var size = p.options.k ? p.options.k : recs.length;
             //            return recs.quickSort('score').slice(0,size);
-            return recs.sort(function(r1, r2){
+            recs =  recs.sort(function(r1, r2){
                 if(r1.score > r2.score) return -1;
                 if(r1.score < r2.score) return 1;
                 return 0;
             }).slice(0,size);
+
+           console.log('********************************** BETA = ' + p.options.beta + '; TOPIC = ' + p.topic + '; KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
+            for(var i=0, len=5; i<len;++i) {
+                var d = recs[i],
+                    obj = {
+                    title: _this.data[d.doc].title,
+                    SCORE: d.score,
+                    Uscore: d.misc.userScore,
+                    Tscore: d.misc.tagScore,
+                    user: d.misc.users
+                }
+                console.log(obj);
+                //console.log(_this.data[d.doc].title + ' --- SCORE = ' + d.score + ';  U-score = ' + d.misc.userScore + '; T-score = ' + d.misc.tagScore);
+            }
+
+            return recs;
+
         },
 
         clear: function() {

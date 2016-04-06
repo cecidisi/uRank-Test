@@ -166,17 +166,20 @@ window.RS_TU = (function(){
                         var simTD = parseFloat(0.8 * probDT + 0.2 * normTfidf);
 
                         // search in neighborhood for current tag
-                        var sumSimUV = 0.0;
+                        var sumSimVD = 0.0;
                         for(var j=0, nLen=neighbors.length; j<nLen; ++j) {
 
                             var v = neighbors[j];
                             if(!simUsersCurrentDoc[v.user]) {
-                                simUsersCurrentDoc[v.user] = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1 : getUserDocSimilarity(_this.userProfile[v.user], d, docNorm );
+                                //simUsersCurrentDoc[v.user] = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1 : getUserDocSimilarity(_this.userProfile[v.user], d, docNorm );
+                                var directSim = (_this.userItemMatrix[v.user] && _this.userItemMatrix[v.user][doc]) ? 1 : 0;
+                                simUsersCurrentDoc[v.user] = directSim ? directSim : getUserDocSimilarity(_this.userProfile[v.user], d, docNorm );
+
                             }
-                            sumSimUV += (v.simVT[tag]) ? (parseFloat(v.simVT[tag] * simUsersCurrentDoc[v.user])) : 0.0;
+                            sumSimVD += (v.simVT[tag]) ? (parseFloat(v.simVT[tag] * simUsersCurrentDoc[v.user])) : 0.0;
                         }
 
-                        var tagScore = simUT[tag] * ( p.options.beta * simTD + (1 - p.options.beta) * sumSimUV );
+                        var tagScore = simUT[tag] * ( p.options.beta * simTD + (1 - p.options.beta) * sumSimVD );
                         tags[tag] = { tagScore: tagScore, tagged: (_this.itemTagMatrix[doc][tag] || 0), tfidf: (d.keywords[tag] || 0.0), term: p.keywords[k].term };
 
                         score += tagScore;
@@ -197,11 +200,28 @@ window.RS_TU = (function(){
 
             var size = p.options.k ? p.options.k : recs.length;
             //            return recs.quickSort('score').slice(0,size);
-            return recs.sort(function(r1, r2){
+            recs = recs.sort(function(r1, r2){
                 if(r1.score > r2.score) return -1;
                 if(r1.score < r2.score) return 1;
                 return 0;
             }).slice(0,size);
+
+
+           console.log('********************************** BETA = ' + p.options.beta + '; TOPIC = ' + p.topic + '; KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
+            for(var i=0, len=5; i<len;++i) {
+                var d = recs[i],
+                    obj = {
+                    title: _this.data[d.doc].title,
+                    SCORE: d.score,
+                    Uscore: d.misc.userScore,
+                    Tscore: d.misc.tagScore
+                }
+                console.log(obj);
+                //console.log(_this.data[d.doc].title + ' --- SCORE = ' + d.score + ';  U-score = ' + d.misc.userScore + '; T-score = ' + d.misc.tagScore);
+            }
+
+            return recs;
+
         },
 
         clear: function() {
