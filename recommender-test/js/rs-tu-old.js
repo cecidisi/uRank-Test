@@ -157,6 +157,7 @@ window.RS_TU_OLD = (function(){
                 return 0;
             }).slice(0,size);
 
+/*
            console.log('********************************** BETA = ' + p.options.beta + '; TOPIC = ' + p.topic + '; KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
             for(var i=0, len=5; i<len;++i) {
                 var d = recs[i],
@@ -170,7 +171,7 @@ window.RS_TU_OLD = (function(){
                 console.log(obj);
                 //console.log(_this.data[d.doc].title + ' --- SCORE = ' + d.score + ';  U-score = ' + d.misc.userScore + '; T-score = ' + d.misc.tagScore);
             }
-
+*/
             return recs;
 
         },

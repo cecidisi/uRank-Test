@@ -87,7 +87,6 @@ window.RS_TU_ALT = (function(){
                 }
             }, args);
 
-            console.log(_this.tagUserMatrix);
             // receives user profile and document object
             var getUserDocSimilarity = function(user, d, dNorm) {
                 var commonTerms = _.intersection(Object.keys(user.tags), Object.keys(d.keywords)),
@@ -260,7 +259,7 @@ window.RS_TU_ALT = (function(){
                 return 0;
             });
 
-           console.log('********************************** BETA = ' + p.options.beta + '; TOPIC = ' + p.topic + '; KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
+          /*console.log('********************************** BETA = ' + p.options.beta + '; TOPIC = ' + p.topic + '; KEYWORDS = ' + p.keywords.map(function(k){ return k.term }).join(', ') );
             for(var i=0, len=5; i<len;++i) {
                 var d = recs[i],
                     obj = {
@@ -272,7 +271,7 @@ window.RS_TU_ALT = (function(){
                 }
                 console.log(obj);
                 //console.log(_this.data[d.doc].title + ' --- SCORE = ' + d.score + ';  U-score = ' + d.misc.userScore + '; T-score = ' + d.misc.tagScore);
-            }
+            }*/
 
             recs = recs.slice(0,size);
 

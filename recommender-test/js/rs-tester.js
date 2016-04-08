@@ -12,6 +12,8 @@ window.RStester = (function(){
             MP: new RS_MP(),
             CB: new RS_CB()
         }
+
+        this.data = window.documents;
     }
 
 
@@ -20,26 +22,46 @@ window.RStester = (function(){
         getTopKLists: function(data, k, betas) {
             k = k || 5;
             betas = betas || [0.0, 0.5, 1.0];
-            var list = {};
-            var TUrs = 'TU_ALT';
+            var TUrs = 'TU';
+            // Scaffold list by topic and question
+            var config = {
+                'T1 WW': {
+                    1: { task: 'focus', keywords: 'participation,woman,workforce' },
+                    2: { task: 'focus', keywords: 'gap,gender,wage' },
+                    3: { task: 'broad', keywords: 'inequality,man,salary,wage,woman,workforce' }
+                },
+                'T2 Ro': {
+                    1: { task: 'focus', keywords: 'autonomous,robot' },
+                    2: { task: 'focus', keywords: 'human,interaction,robot' },
+                    3: { task: 'broad', keywords: 'control,information,robot,sensor' }
+                },
+                'T3 AR': {
+                    1: { task: 'focus', keywords: 'environment,virtual' },
+                    2: { task: 'focus', keywords: 'context,object,recognition' },
+                    3: { task: 'broad', keywords: 'augmented,environment,image,reality,video,world' }
+                },
+                'T4 CE': {
+                    1: { task: 'focus', keywords: 'management,waste' },
+                    2: { task: 'focus', keywords: 'china,industrial,symbiosis' },
+                    3: { task: 'broad', keywords: 'circular,economy,fossil,fuel,system,waste' }
+                }
+            };
+
+            // Train all RS with 100% bookmarks
             data.forEach(function(d){
-                // Add all bookmarks for training
                 _this.RS[TUrs].addBookmark(d);
                 _this.RS.MP.addBookmark(d);
                 _this.RS.CB.addBookmark(d);
-
-                // Scaffold list by topic and question
-                if(!list[d.topic])
-                    list[d.topic] = {};
-                if(!list[d.topic][d.question])
-                    list[d.topic][d.question] = { task: d.task, keywords: d.keywords };
             });
 
+            var stemmer = natural.PorterStemmer;
+            stemmer.attach();
             // Get recommendation lists @k by topic and question
-            Object.keys(list).forEach(function(topic){
-                Object.keys(list[topic]).forEach(function(question){
-                    var keywords = list[topic][question].keywords,
+            Object.keys(config).forEach(function(topic){
+                Object.keys(config[topic]).forEach(function(question){
+                    var keywords = config[topic][question].keywords.split(',').map(function(w){ return { stem: w.stem(), term: w, weight: 1 } }),
                         lists = {};
+
                     betas.forEach(function(beta){
                         var TUalg = (parseFloat(beta) == 0.0) ? 'U' : (parseFloat(beta) == 1.0 ? 'T' : 'TU');
                         lists[TUalg] = _this.RS[TUrs].getRecommendations({ topic: topic, keywords: keywords, options: { beta: beta, k: k, neighborhoodSize: 20 } })
@@ -48,16 +70,14 @@ window.RStester = (function(){
                     lists['CB'] = _this.RS.CB.getRecommendations({ keywords: keywords, options: { k: k } });
 
                     Object.keys(lists).forEach(function(rs){
-                        lists[rs].forEach(function(d){
-                            d.title = window.documents[d.doc].title;
-                        })
+                        lists[rs].forEach(function(d){ d.title = window.documents[d.doc].title; });
                     });
 
-                    list[topic][question].recs = lists;
+                    config[topic][question].recs = lists;
                 });
             });
             //console.log(JSON.stringify(list));
-            return list;
+            return config;
         },
 
         clear: function(){
@@ -66,7 +86,7 @@ window.RStester = (function(){
             });
         },
 
-        testRecommender: function(recommender, kArray, trainingData, testData, options, iteration) {
+        testRecommender: function(recommender, kArray, trainingData, testData, options, iteration, isShort) {
             var o = $.extend({
                 k: 0,
                 beta: 0.5
@@ -98,6 +118,13 @@ window.RStester = (function(){
                 };
                 var recs = rs.getRecommendations(args);
                 if(!recs.length) emptyRecs++;
+
+                if(isShort) {
+                    console.log('==> ' + _this.data[d.doc].title);
+                    recs.slice(0,5).forEach(function(r, i){
+                        console.log('   ' + (i+1) + '. ' + _this.data[r.doc].title.substr(0,50) + '... (score = ' + Math.roundTo(r.score,8) + '; t = ' + Math.roundTo(r.misc.tScore,8) + '; u = ' + Math.roundTo(r.misc.uScore,8) + ')' );
+                    })
+                }
 
                 kArray.forEach(function(k){
                     var rank = _.findIndex(recs.slice(0,k), function(r){ return r.doc == d.doc }) + 1;

@@ -54,11 +54,11 @@
         evaluationResults.forEach(function(r, i){
             r['tasks-results'].forEach(function(t){
                 t['questions-results'].forEach(function(q, j){
-                    var keywords = getKeywords(t.query, q['question-number']);
+                    var keywords = getKeywords(t.query, q['question-number']).map(function(k){ return { term: k, stem: k.stem(), weight: 1 } });
                     var user = (r.user - 1) * 3 + q['question-number'];
 
                     q['selected-items'].forEach(function(d){
-                        var usedKeywords = shuffle(keywords.slice().map(function(k){ return { term: k, stem: k.stem(), weight: 1 } }));
+                        var usedKeywords = shuffle(keywords.slice());
                         if(!notRandomize && q["question-number"]===2)
                             usedKeywords = usedKeywords.slice(0, randomFromTo(2,keywords.length));
                         else if(!notRandomize && q["question-number"]===3)
@@ -213,7 +213,11 @@
 
 
 
-    var runTest = function() {
+    var runTest = function(isShort, iterations, pctg, betaValues) {
+        iterations = iterations || parseFloat($selectIterations.val());
+        pctg = pctg || parseFloat($selectPctgTraining.val() / 100);
+        betaValues = betaValues || [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0],    //  array of float
+
         results = [];
         $tableResults.find(tbody).empty();
 //        $tableStats.find(tbody).empty();
@@ -222,23 +226,23 @@
 
         var numberTUTests = $selectNumberTests.val(),
             topNarray = $selectTopN.multipleSelect('getSelects').map(function(value){ return parseInt(value) }),
-            iterations = $selectIterations.val(),
-            pctg = parseFloat($selectPctgTraining.val() / 100),
-            betaValues = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],    //  array of float
             conditions = [];    //  array { alg:string, beta:float }
         
         betaValues.forEach(function(beta){
-            conditions.push({ alg: 'TU_ALT', beta: beta });
-            if($ckbAlt.is(':checked')) {
-                conditions.push({ alg: 'TU', beta: beta });
+            conditions.push({ alg: 'TU', beta: beta });
+            if($ckbAlt.is(':checked') && !isShort) {
+                conditions.push({ alg: 'TU_ALT', beta: beta });
                 conditions.push({ alg: 'TU_OLD', beta: beta });
             }
         })
 
-        if($ckbMP.is(':checked'))
-            conditions.push({ alg: 'MP', beta: -1 });
-        if($ckbCB.is(':checked'))
-            conditions.push({ alg: 'CB', beta: -1 });
+        if(!isShort) {
+            if($ckbMP.is(':checked'))
+                conditions.push({ alg: 'MP', beta: -1 });
+            if($ckbCB.is(':checked'))
+                conditions.push({ alg: 'CB', beta: -1 });
+        }
+
 
         //var totalToProcess = conditions.length * topNarray.length * iterations,
         var totalToProcess = conditions.length * iterations,
@@ -259,7 +263,7 @@
             setTimeout(function(){
 
                 var rsOptions = { beta: beta };
-                var res = rsTester.testRecommender(algorithm, topNarray, trainingData.slice(), testData.slice(), rsOptions, iteration);
+                var res = rsTester.testRecommender(algorithm, topNarray, trainingData.slice(), testData.slice(), rsOptions, iteration, isShort);
                 var algStr = beta > -1 ? algorithm + '(beta=' + beta + ')' : algorithm;
 
                 results = $.merge(results, res);
@@ -282,7 +286,6 @@
                         if(r1.beta > r2.beta) return 1;
                         if(r1.k < r2.k) return -1;
                         if(r1.k > r2.k) return 1;
-
                         return 0;
                     });
 
@@ -290,13 +293,12 @@
                     //console.log(rsTester.getHitCount());
                     $statusMsg.removeClass('red').addClass('green').text('Test finished!');
                     $downloadLinks.show();
-                    return;
+                    return results;
                 }
 
                 return process(data, iteration, condIndex);
             }, 1);
         }
-
 
         process(getTrainingAndTestData(pctg), 1, 0);
     };    
@@ -329,7 +331,6 @@
     };
 
     var saveData = function(content, fileExtension) {
-
         $.post('../server/save.php', { data: content, ext: fileExtension} )
         .done(function(msg){ console.log(msg) })
         .fail(function(jqXHR){ console.log('Error saving data'); console.log(jqXHR) })
@@ -338,7 +339,8 @@
 
     //  Bind event handlers
 
-    $btnRun.on('click', runTest);
+    $btnRun.click(function(evt){ evt.stopPropagation(); runTest(); });;
+    $('#run-short').click(function(evt){ evt.stopPropagation(); runTest(true, 1, 0.997, [0.0,0.5,1.0]); });
     $selectNumberTests.on('change', selectNumberTestsChanged).trigger('change');
     $testSections.find('.spinner-beta').spinner({ min: 0, max: 1, step: 0.1 });
     $selectTopN.multipleSelect();
@@ -346,9 +348,12 @@
 
     $('#download-bookmarks').click(function(){ downloadData('bookmarks', 'json', JSON.stringify(data)) });
     $('#download-recs').click(function(){
-        //downloadData('recs', 'json', JSON.stringify(rsTester.getTopKLists(getInitData())));
-        var recs = rsTester.getTopKLists(getInitData(true));
-       // console.log(JSON.stringify(recs));
+        //console.log(' ************ NOT RANDOMIZED');
+        //console.log(JSON.stringify(rsTester.getTopKLists(getInitData(true))));
+
+        //console.log(' ************ RANDOMIZED');
+        //console.log(JSON.stringify(rsTester.getTopKLists(getInitData())));
+        downloadData('recs', 'json', JSON.stringify(rsTester.getTopKLists(getInitData())));
     });
     $('#download-documents').click(function(evt){ evt.stopPropagation(); downloadData('documents', 'json', JSON.stringify(getDocumentsWithKeywords())); });
     $downloadResultsJson.click(function(){ saveData(JSON.stringify(results), 'json') });
